@@ -16,14 +16,13 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import bitarray
-import helpers
 import io
 
 
-class Ulz:
-    """Class for manage the Ulz compression format in Ace Combat 3, at
-    the moment the class decompress only on Ulz version 0 and 2"""
+class UlzReader:
+    """
+    Read compressed Ulz files made for Ace Combat 3 version 0 and 2
+    """
 
     def __init__(self, ulz_stream):
         """Accepts a strem for read the Ulz data, this function reads
@@ -40,21 +39,26 @@ class Ulz:
         self.u_type = self.ulz_stream.read(1)
         if self.u_type != b'\x00' and self.u_type != b'\x02':
             raise Exception('Format "{}" not supported'.format(self.u_type))
-        self.u_type = helpers.b2uint(self.u_type)
+        self.u_type = self.b2uint(self.u_type)
 
-        self.uncompressed_size = helpers.b2uint(raw_uncompressed_size)
+        self.uncompressed_size = self.b2uint(raw_uncompressed_size)
 
         raw_uncompressed_offset = self.ulz_stream.read(3)
         self.nbits = self.ulz_stream.read(1)
-        self.nbits = helpers.b2uint(self.nbits)
-        self.uncompressed_offset = helpers.b2uint(raw_uncompressed_offset)
+        self.nbits = self.b2uint(self.nbits)
+        self.uncompressed_offset = self.b2uint(raw_uncompressed_offset)
         raw_compressed_offset = self.ulz_stream.read(4)
-        self.compressed_offset = helpers.b2uint(raw_compressed_offset[:-1])
+        self.compressed_offset = self.b2uint(raw_compressed_offset[:-1])
 
         self.mask_run = ((1 << self.nbits) + 0xffff) & 0xFFFF
 
         self.flags = []
         self.flag_start = self.ulz_stream.tell()
+
+        self.longest_jump = 0
+        self.longest_run = 0
+        self.count_compressed = 0
+        self.count_uncompressed = 0
 
     def get_flags(self):
         """Reads the flags form the ulz stream at 32bit at time, it
@@ -66,7 +70,17 @@ class Ulz:
 
         self.flag_start = self.flag_start + 4
         self.ulz_stream.seek(curr, 0)
-        return flags
+
+        # from bytes to boolean, we invert the bits too
+        num_flags = int.from_bytes(flags, byteorder='little')
+        bool_flags = []
+        for x in range(32):
+            bool_flags.insert(
+                0, 
+                False if num_flags & (1 << x) else True
+            )
+        bool_flags.reverse()
+        return bool_flags
 
     def is_compressed_flag(self):
         """Flags has to be read in different ways regarding the Ulz
@@ -76,10 +90,7 @@ class Ulz:
         try:
             is_comp = self.flags.pop()
         except IndexError:
-            flg = self.get_flags()
-            ba = bitarray.bitarray(endian='little')
-            ba.frombytes(flg)
-            ba = ~ba
+            ba = self.get_flags()
             if self.u_type == 0:
                 # The original decompressor checks for the sign in
                 # the registry to figure out if we have to decompress
@@ -106,15 +117,18 @@ class Ulz:
             while out_file.tell() < self.uncompressed_size:
 
                 if self.is_compressed_flag():
-
+                    self.count_compressed += 1
                     self.ulz_stream.seek(c_seek, 0)
-                    data = helpers.b2uint(self.ulz_stream.read(2))
+                    data = self.b2uint(self.ulz_stream.read(2))
                     c_seek = self.ulz_stream.tell()
 
                     jump = data & self.mask_run
                     jump += 1
                     run = data >> self.nbits
                     run += 3
+
+                    self.longest_jump = max(jump, self.longest_jump)
+                    self.longest_run = max(run, self.longest_run)
 
                     out_file.seek(0, 2)
                     curr_position = out_file.tell()
@@ -147,6 +161,7 @@ class Ulz:
                     out_file.seek(0, 2)
                     out_file.write(tmp_buff)
                 else:
+                    self.count_uncompressed += 1
                     self.ulz_stream.seek(u_seek, 0)
                     udata = self.ulz_stream.read(1)
                     u_seek = self.ulz_stream.tell()
@@ -155,3 +170,9 @@ class Ulz:
             self.ulz_stream.close()
             decompressed_data = out_file.getvalue()
         return decompressed_data
+
+    def b2uint(self, number):
+        """Simple function for convert the bytes in little endian to
+        integer"""
+
+        return int.from_bytes(number, byteorder='little', signed=False)
