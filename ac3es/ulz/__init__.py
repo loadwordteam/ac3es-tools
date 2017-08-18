@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 #  This file is part of AC3ES Tools.
 #
 #  AC3ES Tools is free software: you can redistribute it and/or modify
@@ -16,8 +15,5 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def b2uint(number):
-    """Simple function for convert the bytes in little edian to
-    integer"""
-
-    return int.from_bytes(number, byteorder='little', signed=False)
+from ac3es.ulz.reader import UlzReader
+from ac3es.ulz.writer import UlzWriter
