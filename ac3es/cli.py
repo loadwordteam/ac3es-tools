@@ -23,7 +23,7 @@ import sys
 
 import ac3es
 
-VERSION = '1.0b'
+VERSION = '1.1'
 
 
 def prompt_file_exists(filename):
@@ -89,15 +89,11 @@ def compress_file(input_file,
         prompt_file_exists(output_file)
 
     if create_parents:
-        try:
-            os.makedirs(
-                os.path.dirname(output_file),
-                mode=0o644,
-                exist_ok=True
-            )
-        except OSError as exception:
-            if exception.errno != errno.EXIST:
-                raise
+        os.makedirs(
+            os.path.dirname(output_file),
+            mode=0o644,
+            exist_ok=True
+        )
 
     ulz_writer = ac3es.UlzWriter(
         input_file,
@@ -144,11 +140,12 @@ def decompress_file(ulz_path,
     dest_final_directory = os.path.join(*base_path)
 
     if create_parents or create_ulz_data:
-        try:
-            os.makedirs(dest_final_directory)
-        except OSError as exception:
-            if exception.errno != errno.EXIST:
-                raise
+        exist_ok=True
+        os.makedirs(
+            dest_final_directory,
+            mode=0o644,
+            exist_ok=True
+        )
 
     final_path = os.path.join(dest_final_directory, decompressed_filename)
 
