@@ -106,7 +106,7 @@ class UlzWriter:
 
         padding = len(self.uncompressed_data) % 4
         if padding:
-            self.uncompressed_data += b'\x00' * padding
+            self.uncompressed_data += b'\x00' * (4 - padding)
 
         self.offset_uncompressed = 16 + len(self.flags)
 
@@ -194,7 +194,10 @@ class UlzWriter:
         else:
             raise Exception('Ulz format not supported')
 
-        logging.debug("flags %d", len(bit_flags))
+        padding = len(self.flags) % 4
+        if padding:
+            self.flags = b'\x00' * (4-padding)
+
 
     def save(self, dest_filename=None):
         """

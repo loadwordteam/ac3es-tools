@@ -26,7 +26,7 @@ with open('COPYING') as f:
 
 setup(
     name='ac3tools',
-    version='1.0b',
+    version='1.1',
     description='Various tools for manipulate Ace Combat 3 game files',
     long_description=readme,
     author='Gianluigi "Infrid" Cusimano',
