@@ -102,6 +102,26 @@ More parameters are avaible, just type help for the sub command
     ac3es.py info --help
 
 
+Type 0 vs type 2
+----------------
+
+They are basically the same, ulz 0 is meant to be decompressed faster
+than ulz 2. In reality doesn't matter, the difference are few lines of
+ASM inside the ACE.BIN executable.
+
+Ulz type 0 produces files at least 4 bytes bigger than ulz 2, because
+the compressed data is store a bit different regardless the
+compression ratio. Read the source code for more details.
+
+They are both based on LZ77 and I compress using the same algorithm. I
+don't know why they used two nearly identical formats.
+
+
+Changelog
+---------
+
+2.0 - Ulz type 0 compression is finally working
+
 Contacts
 --------
 
