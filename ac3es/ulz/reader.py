@@ -94,8 +94,8 @@ class UlzReader:
             if self.u_type == 0:
                 # The original decompressor checks for the sign in
                 # the registry to figure out if we have to decompress
-                # the data. It ignores the last bit, I have to figure
-                # out if is just for parity.
+                # the data. It ignores the last bit because the process ends
+                # when the register r11 (used for the flags) is empty.
                 self.flags = ba[1:]
             else:
                 # Version 2 is much simpler, uses all the bits in the

@@ -187,7 +187,8 @@ class UlzWriter:
             for chunk in self.grouper(31, bit_flags, False):
 
                 flag_number = 0
-                for x in (chunk + (False,)):
+                # last bit always true
+                for x in (chunk + (True,)):
                     flag_number = (flag_number << 1) | (1 if x else 0)
 
                 self.flags += struct.pack('<I', flag_number)
@@ -196,8 +197,14 @@ class UlzWriter:
 
         padding = len(self.flags) % 4
         if padding:
-            self.flags = b'\x00' * (4-padding)
+            self.flags += b'\x00' * (4-padding)
 
+        # The decompression algorithm for ulz0 doesn't have any
+        # counters for the final size like ulz2, it relies on the flag
+        # to ends the decompression, the process ends when the code
+        # loads in r11 0x00000000
+        if self.ulz_type == 0:
+            self.flags += b'\x00' * 4
 
     def save(self, dest_filename=None):
         """
