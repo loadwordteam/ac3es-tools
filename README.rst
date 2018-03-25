@@ -10,7 +10,7 @@ It has a full working Ulz compressor/decompressor.
 Requirements
 ------------
 
-You need Python >= 3.2
+You need Python >= 3.4
 
 Usage
 -----
@@ -120,6 +120,7 @@ don't know why they used two nearly identical formats.
 Changelog
 ---------
 
+2.1 - Split and merge bin containers 
 2.0 - Ulz type 0 compression is finally working
 
 Contacts
