@@ -17,7 +17,7 @@
 
 from ac3es import command_parser
 from ac3es import InfoFile
-from ac3es import compress_file, decompress_file
+from ac3es import compress_file, decompress_file, bin_file_split, bin_file_merge
 
 
 if __name__ == '__main__':
@@ -49,5 +49,15 @@ if __name__ == '__main__':
         info = InfoFile()
         for x in args.FILES:
             info.detect(x)
+    elif args.command == 'bin':
+        if args.split:
+            bin_file_split(
+                args.split,
+                args.out_list,
+                args.out_directory
+            )
+        elif args.merge:
+            bin_file_merge(args.merge, args.out_bin, args.verbose)
+            
     else:
         parser.print_help()

@@ -16,5 +16,6 @@
 
 
 from ac3es.ulz import *
-from ac3es.cli import compress_file, decompress_file, command_parser
+from ac3es.cli import compress_file, decompress_file, command_parser, bin_file_merge, bin_file_split
 from ac3es.info import InfoFile
+from ac3es.bin_splitter import BinSplitter

@@ -20,10 +20,10 @@ import errno
 import io
 import os.path
 import sys
-
+import pathlib
 import ac3es
 
-VERSION = '1.1'
+VERSION = '2.1'
 
 
 def prompt_file_exists(filename):
@@ -105,6 +105,49 @@ def compress_file(input_file,
     ulz_writer.pack_file()
     ulz_writer.save(output_file)
 
+def bin_file_split(bin_path, list_path=None, outdir_path=None):
+    if not os.path.exists(bin_path):
+        print("File", bin_path, "does not exists")
+        exit()
+
+    if not outdir_path:
+        outdir_path = bin_path + '_bin_splitter'
+
+    if not list_path:
+        list_path = str(pathlib.Path(outdir_path).joinpath('bin_splitter_list.txt'))
+
+    if not pathlib.Path(outdir_path).exists():
+        os.mkdir(outdir_path)
+
+    with open(bin_path, 'rb') as bin_stream:
+        bs = ac3es.BinSplitter()
+        bs.split(bin_stream, outdir_path, list_path)
+
+def bin_file_merge(source_list, dest_path, verbose=False):
+    content_list=[]
+    if os.path.isfile(source_list):
+        with open(source_list) as f:
+            content_list = f.readlines()
+        content_list = [x.strip() for x in content_list]
+    elif os.path.isdir(source_list):
+        p = pathlib.Path(source_list)
+        content_list = [x for x in p.iterdir() if x.is_file()]
+        content_list.sort()
+    else:
+        print('I need a valid file list or a directory')
+        exit()
+
+    for entry in content_list:
+        if str(entry).find('bin_splitter_list.txt') >= 0:
+            content_list.remove(entry)
+        
+    if verbose:
+        for entry in content_list:
+            print(dest_path+':', entry)
+            
+    bs = ac3es.BinSplitter()
+    bs.merge_all(content_list, dest_path)
+    
 
 def decompress_file(ulz_path,
                     dest_filename=None,
@@ -261,4 +304,51 @@ Homepage: <http://ac3es.infrid.com/>
         nargs="+"
     )
 
+    parser_bin = subparsers.add_parser('bin', help='Split and merge bin container files')
+    sub_bin_splitter = parser_bin.add_mutually_exclusive_group()
+
+    sub_bin_splitter.add_argument(
+        '--split',
+        '-s',
+        metavar=('BIN_FILE'),
+        help='Split a bin container'
+    )
+
+    bin_splitter = parser_bin.add_argument_group('bin split')
+    bin_splitter.add_argument(
+        '--out-directory',
+        '-d',
+        metavar=('DIRECTORY'),
+        help='Output directory where to store the bin\'s components'
+    )
+
+    bin_splitter.add_argument(
+        '--out-list',
+        '-f',
+        metavar=('DIRECTORY'),
+        help='Save a components\' list to a txt'
+    )
+
+    sub_bin_splitter.add_argument(
+        '--merge',
+        '-m',
+        metavar=('FILE_LIST|DIR'),
+        help='Reconstruct a bin file starting from a component list or a directory'
+    )
+
+    bin_splitter.add_argument(
+        '--out-bin',
+        '-b',
+        metavar=('FILE_BIN'),
+        help='Output bin filename'
+    )
+
+    bin_splitter.add_argument(
+        '--verbose',
+        '-v',
+        action='store_true',
+        help='Print more information while merges'
+    )
+
+    
     return parser
