@@ -16,7 +16,6 @@
 
 
 import argparse
-import errno
 import io
 import os.path
 import sys
