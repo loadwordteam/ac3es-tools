@@ -215,9 +215,14 @@ or define another destination
 Get what parameters use from the original file
   {0} info BPB/0386/0001/0000.ulz
 
-More parameters are avaible, just type help for the sub command
+Work on bin containers
+  {0} bin --split=BPB/0114/0007.bin --out-directory=splitted/0007 --out-list=splitted/0007.txt
+  {0} bin --merge=splitted/0007.txt --out-bin=mod_0007.bin
+
+More parameters are available, just type help for the sub command
   {0} ulz --help
   {0} info --help
+  {0} bin --help
 
 Report bugs to: infrid@infrid.com
 AC3ES Version {1}
