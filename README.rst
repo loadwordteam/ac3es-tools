@@ -88,7 +88,44 @@ Info command
     optional arguments:
       -h, --help  show this help message and exit
 
+
+TIM editing command
+^^^^^^^^^^^^^^^^^^^
+::
+
+    usage: ac3es.py tim [-h] --source-tim TIM_FILE [--copy-clut] [--copy-vram]
+                     [--set-vram-x X] [--set-vram-y Y]
+                     FILES [FILES ...]
+ 
+    positional arguments:
+      FILES                 Apply the changes to one or more TIM files
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      --source-tim TIM_FILE, -s TIM_FILE
+                            Source TIM
+      --copy-clut           Copy CLUT data from source
+      --copy-vram           Copy V-RAM coordinates
+      --set-vram-x X        Set V-RAM coordinate X
+      --set-vram-y Y        Set V-RAM coordinate Y
       
+BPB unpack/repack command
+^^^^^^^^^^^^^^^^^^^^^^^^^
+::
+
+    usage: ac3es.py bpb [-h] [--unpack DIRECTORY | --pack DIRECTORY]
+                        [--bpb ACE.BPB] [--bph ACE.BPH]
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      --unpack DIRECTORY, -u DIRECTORY
+                            Unpack ACE.BPB/BPH to the given directory                                        
+      --pack DIRECTORY, -p DIRECTORY                                                                         
+                            Pack ACE.BPB and create ACE.BPH from a given directory                           
+      --bpb ACE.BPB         Path for ACE.BPB                                                                 
+      --bph ACE.BPH         Path for ACE.BPH
+
+
 Examples
 ^^^^^^^^
 
@@ -144,6 +181,10 @@ don't know why they used two nearly identical formats.
 
 Changelog
 ---------
+
+2.3 - Unpack/repack ACE.BPB and ACE.BPH
+
+2.2 - Edit TIM header and CLUT data
 
 2.1 - Split and merge bin containers
 
