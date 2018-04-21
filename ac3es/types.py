@@ -14,9 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
+import collections
 
-from ac3es.ulz import *
-from ac3es.info import InfoFile
-from ac3es.bin_splitter import BinSplitter
-from ac3es.tim import Tim
-from ac3es.bpb import Bpb
+
+BpbChunk = collections.namedtuple('BpbChunk', ['header', 'offsets', 'chunks'])
