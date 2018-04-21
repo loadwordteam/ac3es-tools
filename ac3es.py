@@ -63,7 +63,6 @@ if __name__ == '__main__':
                     args.out_bin,
                     args.verbose
                 )
-
         elif args.command == 'bpb':
             if args.pack is not None:
                 ac3es.cli.pack_bpb(args.bpb, args.bph, args.pack)
