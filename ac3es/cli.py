@@ -16,14 +16,15 @@
 
 
 import argparse
-import errno
 import io
 import os.path
 import sys
-
+import pathlib
 import ac3es
+import struct
+from ac3es.exceptions import CliException, NotTimException
 
-VERSION = '1.1'
+VERSION = '2.3'
 
 
 def prompt_file_exists(filename):
@@ -62,16 +63,14 @@ def compress_file(input_file,
 
     nbits = level2nbits.get(level, None)
     if nbits is None:
-        print('Select the correct compression level')
-        exit(-1)
+        raise CliException('Select the correct compression level')
 
     if like_file:
         try:
             with open(like_file, 'rb') as ulz_file:
                 ulz_stream = io.BytesIO(ulz_file.read())
         except IOError as err:
-            print("Error reading the file {0}: {1}".format(ulz_file, err))
-            exit()
+            raise CliException("Error reading the file {0}: {1}".format(ulz_file, err))
 
         print('creating ulz like', like_file)
 
@@ -105,6 +104,48 @@ def compress_file(input_file,
     ulz_writer.pack_file()
     ulz_writer.save(output_file)
 
+def bin_file_split(bin_path, list_path=None, outdir_path=None):
+    if not os.path.exists(bin_path):
+        raise CliException("File {} does not exists",format(bin_path))
+
+    if not outdir_path:
+        outdir_path = bin_path + '_bin_splitter'
+
+    if not list_path:
+        list_path = str(pathlib.Path(outdir_path).joinpath('bin_splitter_list.txt'))
+
+    if not pathlib.Path(outdir_path).exists():
+        os.mkdir(outdir_path)
+
+    with open(bin_path, 'rb') as bin_stream:
+        bs = ac3es.BinSplitter()
+        bs.split(bin_stream, outdir_path, list_path)
+
+
+def bin_file_merge(source_list, dest_path, verbose=False):
+    content_list = []
+    if os.path.isfile(source_list):
+        with open(source_list) as f:
+            content_list = f.readlines()
+        content_list = [x.strip() for x in content_list]
+    elif os.path.isdir(source_list):
+        p = pathlib.Path(source_list)
+        content_list = [x for x in p.iterdir() if x.is_file()]
+        content_list.sort()
+    else:
+        raise CliException('I need a valid file list or a directory')
+
+    for entry in content_list:
+        if str(entry).find('bin_splitter_list.txt') >= 0:
+            content_list.remove(entry)
+
+    if verbose:
+        for entry in content_list:
+            print(dest_path+':', entry)
+
+    bs = ac3es.BinSplitter()
+    bs.merge_all(content_list, dest_path)
+
 
 def decompress_file(ulz_path,
                     dest_filename=None,
@@ -119,8 +160,7 @@ def decompress_file(ulz_path,
         with open(ulz_path, 'rb') as ulz_file:
             ulz_stream = io.BytesIO(ulz_file.read())
     except IOError as err:
-        print("Error reading the file {0}: {1}".format(ulz_file, err))
-        exit()
+        raise CliException("Error reading the file {0}: {1}".format(ulz_file, err))
 
     ulz = ac3es.UlzReader(ulz_stream)
     data = ulz.decompress()
@@ -156,6 +196,83 @@ def decompress_file(ulz_path,
         out_file.write(data)
 
 
+def copy_tim_data(source_path,
+                  dest_path,
+                  replace_clut=False,
+                  replace_vram=False,
+                  vram_x=None,
+                  vram_y=None):
+
+    if pathlib.Path(source_path).resolve() == pathlib.Path(dest_path).resolve():
+        raise CliException('cannot operate on the same file')
+
+    try:
+        with open(source_path, 'rb') as source_stream, open(dest_path, 'rb+') as dest_stream:
+            source_tim = ac3es.Tim(source_stream)
+            dest_tim = ac3es.Tim(dest_stream)
+            
+            if replace_clut:
+                if source_tim.bpp not in (4, 8):
+                    raise CliException('Source is {}bpp, clut data is only for 4bpp or 8bpp'.format(source_tim.bpp))
+
+                if dest_tim.bpp not in (4, 8):
+                    raise CliException('Destination is {}bpp, clut data is only for 4bpp or 8bpp'.format(dest_tim.bpp))
+
+                if dest_tim.bpp != source_tim.bpp:
+                    raise CliException('BBP must to be the same, source {}bpp, destination {}bpp'.format(source_tim.bpp, dest_tim.bpp))
+
+                source_stream.seek(source_tim.offsets['clut_header_start'], 0)
+                clut = source_stream.read(
+                    source_tim.offsets['clut_header_end'] - source_tim.offsets['clut_header_start']
+                )
+                dest_stream.seek(dest_tim.offsets['clut_header_start'], 0)
+                dest_stream.write(clut)
+
+            if replace_vram:
+                dest_stream.seek(dest_tim.offsets['vram_x'], 0)
+                dest_stream.write(struct.pack('<H', source_tim.vram_x))
+                dest_stream.seek(dest_tim.offsets['vram_y'], 0)
+                dest_stream.write(struct.pack('<H', source_tim.vram_y))
+
+            if vram_x is not None:
+                if vram_x < 0 or vram_x > 255:
+                    raise CliException('vram-x out of range (0-255)')
+
+                dest_stream.seek(dest_tim.offsets['vram_x'], 0)
+                dest_stream.write(struct.pack('<H', vram_x))
+
+            if vram_y is not None:
+                if vram_y < 0 or vram_y > 255:
+                    raise CliException('vram-y out of range (0-255)')
+
+                dest_stream.seek(dest_tim.offsets['vram_y'], 0)
+                dest_stream.write(struct.pack('<H', vram_y))
+    except NotTimException as e:
+        raise CliException(str(e))
+
+
+def unpack_bpb(bpb, bph, dest_dir):
+    if not os.path.isfile(bpb):
+        raise CliException('Cannot access to {} for BPB'.format(bpb))
+
+    if not os.path.isfile(bph):
+        raise CliException('Cannot access to {} for BPH'.format(bph))
+
+    if not os.path.isdir(dest_dir):
+        os.mkdir(dest_dir)
+
+    BpbManager = ac3es.Bpb(bpb, bph)
+    BpbManager.unpack(dest_dir)
+
+
+def pack_bpb(bpb, bph, source_dir):
+    if not os.path.isdir(source_dir):
+         raise CliException('Cannot access to {} as source'.format(source_dir))
+
+    BpbManager = ac3es.Bpb(bpb, bph)
+    BpbManager.pack(source_dir)
+
+
 def command_parser():
     """
     Creates the parser and the options
@@ -172,9 +289,14 @@ or define another destination
 Get what parameters use from the original file
   {0} info BPB/0386/0001/0000.ulz
 
-More parameters are avaible, just type help for the sub command
+Work on bin containers
+  {0} bin --split=BPB/0114/0007.bin --out-directory=splitted/0007 --out-list=splitted/0007.txt
+  {0} bin --merge=splitted/0007.txt --out-bin=mod_0007.bin
+
+More parameters are available, just type help for the sub command
   {0} ulz --help
   {0} info --help
+  {0} bin --help
 
 Report bugs to: infrid@infrid.com
 AC3ES Version {1}
@@ -254,10 +376,142 @@ Homepage: <http://ac3es.infrid.com/>
         help='prompt before every removal or destructive change'
     )
 
+    # BPB
+
+    parser_bpb = subparsers.add_parser(
+        'bpb',
+        help='Unpack and repack ACE.BPB and ACE.BPH'
+    )
+
+    parser_bpb_main = parser_bpb.add_mutually_exclusive_group()
+    parser_bpb_main.add_argument(
+        '--unpack',
+        '-u',
+        metavar=('DIRECTORY'),
+        help='Unpack ACE.BPB/BPH to the given directory'
+    )
+
+    parser_bpb_main.add_argument(
+        '--pack',
+        '-p',
+        metavar=('DIRECTORY'),
+        help='Pack ACE.BPB and create ACE.BPH from a given directory'
+    )
+
+    parser_bpb.add_argument(
+        '--bpb',
+        metavar=('ACE.BPB'),
+        help='Path for ACE.BPB'
+    )
+
+    parser_bpb.add_argument(
+        '--bph',
+        metavar=('ACE.BPH'),
+        help='Path for ACE.BPH'
+    )
+
+    parser_bpb.set_defaults(bpb='ACE.BPB', bph='ACE.BPH')
+
+    # INFO
+
     parser_info = subparsers.add_parser('info', help='Check files')
     parser_info.add_argument(
         'FILES',
         help="One or more file to get info",
+        nargs="+"
+    )
+
+    parser_bin = subparsers.add_parser(
+        'bin',
+        help='Split and merge bin container files'
+    )
+    sub_bin_splitter = parser_bin.add_mutually_exclusive_group()
+
+    sub_bin_splitter.add_argument(
+        '--split',
+        '-s',
+        metavar=('BIN_FILE'),
+        help='Split a bin container'
+    )
+
+    bin_splitter = parser_bin.add_argument_group('bin split')
+    bin_splitter.add_argument(
+        '--out-directory',
+        '-d',
+        metavar=('DIRECTORY'),
+        help='Output directory where to store the bin\'s components'
+    )
+
+    bin_splitter.add_argument(
+        '--out-list',
+        '-f',
+        metavar=('DIRECTORY'),
+        help='Save a components\' list to a txt'
+    )
+
+    sub_bin_splitter.add_argument(
+        '--merge',
+        '-m',
+        metavar=('FILE_LIST|DIR'),
+        help='Reconstruct a bin file starting from a component list or a directory'
+    )
+
+    bin_splitter.add_argument(
+        '--out-bin',
+        '-b',
+        metavar=('FILE_BIN'),
+        help='Output bin filename'
+    )
+
+    bin_splitter.add_argument(
+        '--verbose',
+        '-v',
+        action='store_true',
+        help='Print more information while merges'
+    )
+
+    tim_parser = subparsers.add_parser(
+        'tim',
+        help='Edit TIM header information and/or replace CLUT data'
+    )
+
+    tim_parser.add_argument(
+        '--source-tim',
+        '-s',
+        required=True,
+        metavar=('TIM_FILE'),
+        help='Source TIM'
+    )
+
+    tim_parser.add_argument(
+        '--copy-clut',
+        action='store_true',
+        help='Copy CLUT data from source'
+    )
+
+    tim_parser.add_argument(
+        '--copy-vram',
+        action='store_true',
+        help='Copy V-RAM coordinates'
+    )
+
+    tim_parser.add_argument(
+        '--set-vram-x',
+        type=int,
+        metavar=('X'),
+        help='Set V-RAM coordinate X'
+    )
+
+    tim_parser.add_argument(
+        '--set-vram-y',
+        type=int,
+        metavar=('Y'),
+        help='Set V-RAM coordinate Y'
+    )
+
+    tim_parser.add_argument(
+        'FILES',
+        help="Apply the changes to one or more TIM files",
         nargs="+"
     )
 

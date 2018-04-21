@@ -4,40 +4,31 @@ AC3ES Tools
 This is a collection of tools for manipulate games files for the game
 Ace Combat 3.
 
-It has a full working Ulz compressor/decompressor.
-
+Work on *bin* containers and has a full working Ulz
+compressor/decompressor!
 
 Requirements
 ------------
 
-You need Python >= 3.2
+Now you need Python >= 3.4
 
 Usage
 -----
 
 The tool has two sub commands, the *ulz* command for compress/decompress files
-and *info* for get details about the ulz and the known iso or bpb of the game.
+and *info* for get details about the ulz and the known iso or bpb of
+the game.
 
-..
+Ulz command
+^^^^^^^^^^^
 
-    usage: ac3es.py [-h] {ulz,info} ...
-    
-    positional arguments:
-      {ulz,info}  Commands
-        ulz       Manipulate ulz files
-        info      Check files
-    
-    optional arguments:
-      -h, --help  show this help message and exit
-    
-
-..
+::
 
     usage: ac3es.py ulz [-h] [--compress FILE] [--ulz-type {0,2}]
-                        [--level {1,2,4,8}] [--store-only] [--like-file LIKE_FILE]
-                        [--decompress ULZ] [--output-file FILE] [--parents]
-                        [--keep]
-    
+                     [--level {1,2,4,8}] [--store-only] [--like-file LIKE_FILE]
+                     [--decompress ULZ] [--output-file FILE] [--parents]
+                     [--keep]
+
     optional arguments:
       -h, --help            show this help message and exit
       --compress FILE, -c FILE
@@ -49,7 +40,7 @@ and *info* for get details about the ulz and the known iso or bpb of the game.
       --parents, -p         Create directories for destination files if they don't
                             exists
       --keep, -k            prompt before every removal or destructive change
-    
+
     compression:
       --ulz-type {0,2}      Define the ulz version to use
       --level {1,2,4,8}, -l {1,2,4,8}
@@ -59,54 +50,125 @@ and *info* for get details about the ulz and the known iso or bpb of the game.
                             level
       --like-file LIKE_FILE
                             Get compression parameters from file
-    
 
-.. 
+Bin command
+^^^^^^^^^^^
+::
+
+    usage: ac3es.py bin [-h] [--split BIN_FILE] [--out-directory DIRECTORY]
+                        [--out-list DIRECTORY] [--merge FILE_LIST|DIR]
+                        [--out-bin FILE_BIN] [--verbose]
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --split BIN_FILE, -s BIN_FILE
+                            Split a bin container
+      --merge FILE_LIST|DIR, -m FILE_LIST|DIR
+                            Reconstruct a bin file starting from a component list
+                            or a directory
+
+    bin split:
+      --out-directory DIRECTORY, -d DIRECTORY
+                            Output directory where to store the bin's components
+      --out-list DIRECTORY, -f DIRECTORY
+                            Save a components' list to a txt
+      --out-bin FILE_BIN, -b FILE_BIN
+                            Output bin filename
+      --verbose, -v         Print more information while merges
+
+Info command
+^^^^^^^^^^^^
+::
 
     usage: ac3es.py info [-h] FILES [FILES ...]
-    
+
     positional arguments:
       FILES       One or more file to get info
-    
+
     optional arguments:
       -h, --help  show this help message and exit
+
+
+TIM editing command
+^^^^^^^^^^^^^^^^^^^
+::
+
+    usage: ac3es.py tim [-h] --source-tim TIM_FILE [--copy-clut] [--copy-vram]
+                     [--set-vram-x X] [--set-vram-y Y]
+                     FILES [FILES ...]
+ 
+    positional arguments:
+      FILES                 Apply the changes to one or more TIM files
     
+    optional arguments:
+      -h, --help            show this help message and exit
+      --source-tim TIM_FILE, -s TIM_FILE
+                            Source TIM
+      --copy-clut           Copy CLUT data from source
+      --copy-vram           Copy V-RAM coordinates
+      --set-vram-x X        Set V-RAM coordinate X
+      --set-vram-y Y        Set V-RAM coordinate Y
+      
+BPB unpack/repack command
+^^^^^^^^^^^^^^^^^^^^^^^^^
+::
+
+    usage: ac3es.py bpb [-h] [--unpack DIRECTORY | --pack DIRECTORY]
+                        [--bpb ACE.BPB] [--bph ACE.BPH]
     
+    optional arguments:
+      -h, --help            show this help message and exit
+      --unpack DIRECTORY, -u DIRECTORY
+                            Unpack ACE.BPB/BPH to the given directory                                        
+      --pack DIRECTORY, -p DIRECTORY                                                                         
+                            Pack ACE.BPB and create ACE.BPH from a given directory                           
+      --bpb ACE.BPB         Path for ACE.BPB                                                                 
+      --bph ACE.BPH         Path for ACE.BPH
+
 
 Examples
 ^^^^^^^^
 
 Compress an image and put the output into the same directory
 
-..
-
+::
+   
     ac3es.py ulz --compress image.tim --ulz-type=2 --level=1
 
 or define another destination
 
-..
-
+::
+   
     ac3es.py ulz --compress jap_0002.tim --ulz-type=2 --level=1 --output-file=mycompress.ulz
 
 Get what parameters use from the original file
 
-..
-
+::
+   
     ac3es.py info BPB/0386/0001/0000.ulz
 
-More parameters are avaible, just type help for the sub command
+Work on bin containers
 
-..
+::
+   
+    ac3es.py bin --split=BPB/0114/0007.bin --out-directory=splitted/0007 --out-list=splitted/0007.txt
+    ac3es.py bin --merge=splitted/0007.txt --out-bin=mod_0007.bin
 
+
+More parameters are available, just type help for the sub command
+
+::
+   
     ac3es.py ulz --help
     ac3es.py info --help
+    ac3es.py bin --help
 
 
-Type 0 vs type 2
-----------------
+Ulz compression type 0 vs type 2
+--------------------------------
 
-They are basically the same, ulz 0 is meant to be decompressed faster
-than ulz 2. In reality doesn't matter, the difference are few lines of
+They are basically the same, ulz 0 is meant to decompress faster than 
+ulz 2. In reality doesn't matter, the difference are few lines of
 ASM inside the ACE.BIN executable.
 
 Ulz type 0 produces files at least 4 bytes bigger than ulz 2, because
@@ -120,7 +182,19 @@ don't know why they used two nearly identical formats.
 Changelog
 ---------
 
+2.3 - Unpack/repack ACE.BPB and ACE.BPH
+
+2.2 - Edit TIM header and CLUT data
+
+2.1 - Split and merge bin containers
+
 2.0 - Ulz type 0 compression is finally working
+
+Contributors
+------------
+
+- Orientalcomputer_1
+- IlDucci
 
 Contacts
 --------

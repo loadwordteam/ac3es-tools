@@ -15,8 +15,17 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from ac3es.ulz import *
-from ac3es.info import InfoFile
-from ac3es.bin_splitter import BinSplitter
-from ac3es.tim import Tim
-from ac3es.bpb import Bpb
+class Ac3esException(Exception):
+    pass
+
+
+class CliException(Ac3esException):
+    pass
+
+
+class NotTimException(Ac3esException):
+    pass
+
+
+class BinDetectException(Ac3esException):
+    pass
