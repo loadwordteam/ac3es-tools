@@ -18,8 +18,10 @@
 import hashlib
 import io
 import os.path
+import ac3es
 from .ulz import UlzReader
 from .database_md5 import DatabaseMD5
+from ac3es.exceptions import NotTimException
 
 
 class InfoFile():
@@ -44,6 +46,14 @@ class InfoFile():
             exit()
 
         return md5.hexdigest()
+
+    def get_tim_info(self, tim_path):
+        with open(tim_path, 'rb') as tim:
+            tim_file = ac3es.Tim(tim)
+            stats = tim_file.info(tim_path)
+            keys = stats.keys()
+            for key in sorted(keys):
+                print(key, stats[key], sep='\t')
 
     def get_ulz_info(self, ulz_path):
         try:
@@ -84,6 +94,12 @@ class InfoFile():
             self.get_ulz_info(path)
             exit()
 
+        try:
+            self.get_tim_info(path)
+            exit()
+        except NotTimException as e:
+            pass
+        
         hash_value = self.md5_for_file(path)
         report = self.db_md5.find(hash_value)
         if report:
