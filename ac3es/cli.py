@@ -208,25 +208,30 @@ def copy_tim_data(source_path,
 
     try:
         with open(source_path, 'rb') as source_stream, open(dest_path, 'rb+') as dest_stream:
-            source_tim = Tim(source_stream)
-            dest_tim = Tim(dest_stream)
-
+            source_tim = ac3es.Tim(source_stream)
+            dest_tim = ac3es.Tim(dest_stream)
+            
             if replace_clut:
-                if source_tim.clut_data is None:
-                    raise CliException('Source is {}bpp, clut data is only for 4bpp or 8bpp'.format(self.bpp))
+                if source_tim.bpp not in (4, 8):
+                    raise CliException('Source is {}bpp, clut data is only for 4bpp or 8bpp'.format(source_tim.bpp))
 
-                if dest_tim.clut_data is None:
-                    raise CliException('Destination is {}bpp, clut data is only for 4bpp or 8bpp'.format(destination.bpp))
+                if dest_tim.bpp not in (4, 8):
+                    raise CliException('Destination is {}bpp, clut data is only for 4bpp or 8bpp'.format(dest_tim.bpp))
 
-                dest_stream.seek(dest_tim.offsets['n_clut'], 0)
-                dest_stream.write(struct.pack('<H', source_tim.palette_x))
-                dest_stream.write(struct.pack('<H', source_tim.palette_y))
-                dest_stream.write(struct.pack('<H', 0))
-                dest_stream.write(source_tim.clut_data)
+                if dest_tim.bpp != source_tim.bpp:
+                    raise CliException('BBP must to be the same, source {}bpp, destination {}bpp'.format(source_tim.bpp, dest_tim.bpp))
+
+                source_stream.seek(source_tim.offsets['clut_header_start'], 0)
+                clut = source_stream.read(
+                    source_tim.offsets['clut_header_end'] - source_tim.offsets['clut_header_start']
+                )
+                dest_stream.seek(dest_tim.offsets['clut_header_start'], 0)
+                dest_stream.write(clut)
 
             if replace_vram:
                 dest_stream.seek(dest_tim.offsets['vram_x'], 0)
                 dest_stream.write(struct.pack('<H', source_tim.vram_x))
+                dest_stream.seek(dest_tim.offsets['vram_y'], 0)
                 dest_stream.write(struct.pack('<H', source_tim.vram_y))
 
             if vram_x is not None:

@@ -58,15 +58,18 @@ if __name__ == '__main__':
                     args.out_directory
                 )
             elif args.merge:
-                ac3es.cli.bin_file_merge(args.merge, args.out_bin, args.verbose)
-
+                ac3es.cli.bin_file_merge(
+                    args.merge,
+                    args.out_bin,
+                    args.verbose
+                )
         elif args.command == 'bpb':
             if args.pack is not None:
                 ac3es.cli.pack_bpb(args.bpb, args.bph, args.pack)
             elif args.unpack is not None:
                 ac3es.cli.unpack_bpb(args.bpb, args.bph, args.unpack)
         elif args.command == 'tim':
-            for tim_file in args.TIM_FILES:
+            for tim_file in args.FILES:
                 ac3es.cli.copy_tim_data(
                     args.source_tim,
                     tim_file,
