@@ -15,13 +15,13 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from ac3es.cli import command_parser
-from ac3es import InfoFile
 from ac3es.exceptions import CliException
+import ac3es
 import ac3es.cli
 
+
 if __name__ == '__main__':
-    parser = command_parser()
+    parser = ac3es.cli.command_parser()
     args = parser.parse_args()
 
     try:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 )
 
         elif args.command == 'info':
-            info = InfoFile()
+            info = ac3es.InfoFile()
             for x in args.FILES:
                 info.detect(x)
         elif args.command == 'bin':
@@ -76,10 +76,10 @@ if __name__ == '__main__':
                     args.copy_clut,
                     args.copy_vram,
                     args.set_vram_x,
-                    args.set_vram_y
+                    args.set_vram_y,
+                    args.copy_header
                 )
 
     except CliException as e:
         print(e)
-        exit(-1)
-    
+        exit(-1)    

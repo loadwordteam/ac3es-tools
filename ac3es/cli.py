@@ -39,7 +39,7 @@ def prompt_file_exists(filename):
             elif choice == 'y' or choice == 'yes':
                 break
             else:
-                print('Please respond with yes/no', end=' ')
+                print('Please answer with yes/no', end=' ')
 
 
 def compress_file(input_file,
@@ -201,7 +201,8 @@ def copy_tim_data(source_path,
                   replace_clut=False,
                   replace_vram=False,
                   vram_x=None,
-                  vram_y=None):
+                  vram_y=None,
+                  replace_header=False):
 
     if pathlib.Path(source_path).resolve() == pathlib.Path(dest_path).resolve():
         raise CliException('cannot operate on the same file')
@@ -211,6 +212,12 @@ def copy_tim_data(source_path,
             source_tim = ac3es.Tim(source_stream)
             dest_tim = ac3es.Tim(dest_stream)
             
+            if replace_header:
+                source_stream.seek(0)
+                header = source_stream.read(source_tim.offsets['header_end'])
+                dest_stream.seek(0)
+                dest_stream.write(header)
+
             if replace_clut:
                 if source_tim.bpp not in (4, 8):
                     raise CliException('Source is {}bpp, clut data is only for 4bpp or 8bpp'.format(source_tim.bpp))
@@ -235,15 +242,15 @@ def copy_tim_data(source_path,
                 dest_stream.write(struct.pack('<H', source_tim.vram_y))
 
             if vram_x is not None:
-                if vram_x < 0 or vram_x > 255:
-                    raise CliException('vram-x out of range (0-255)')
+                if vram_x < 0 or vram_x > 65535:
+                    raise CliException('vram-x out of range (0-65535)')
 
                 dest_stream.seek(dest_tim.offsets['vram_x'], 0)
                 dest_stream.write(struct.pack('<H', vram_x))
 
             if vram_y is not None:
-                if vram_y < 0 or vram_y > 255:
-                    raise CliException('vram-y out of range (0-255)')
+                if vram_y < 0 or vram_y > 65535:
+                    raise CliException('vram-y out of range (0-65535)')
 
                 dest_stream.seek(dest_tim.offsets['vram_y'], 0)
                 dest_stream.write(struct.pack('<H', vram_y))
@@ -481,6 +488,12 @@ Homepage: <http://ac3es.infrid.com/>
         required=True,
         metavar=('TIM_FILE'),
         help='Source TIM'
+    )
+
+    tim_parser.add_argument(
+        '--copy-header',
+        action='store_true',
+        help='Copy the entire header data from source'
     )
 
     tim_parser.add_argument(

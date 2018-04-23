@@ -20,3 +20,4 @@ from ac3es.info import InfoFile
 from ac3es.bin_splitter import BinSplitter
 from ac3es.tim import Tim
 from ac3es.bpb import Bpb
+import ac3es.cli as cli
