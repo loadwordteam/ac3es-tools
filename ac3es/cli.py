@@ -24,7 +24,7 @@ import ac3es
 import struct
 from ac3es.exceptions import CliException, NotTimException
 
-VERSION = '2.3'
+VERSION = '2.3.1'
 
 
 def prompt_file_exists(filename):
@@ -211,7 +211,7 @@ def copy_tim_data(source_path,
         with open(source_path, 'rb') as source_stream, open(dest_path, 'rb+') as dest_stream:
             source_tim = ac3es.Tim(source_stream)
             dest_tim = ac3es.Tim(dest_stream)
-            
+
             if replace_header:
                 source_stream.seek(0)
                 header = source_stream.read(source_tim.offsets['header_end'])
@@ -304,6 +304,8 @@ More parameters are available, just type help for the sub command
   {0} ulz --help
   {0} info --help
   {0} bin --help
+  {0} tim --help
+  {0} bpb --help
 
 Report bugs to: infrid@infrid.com
 AC3ES Version {1}

@@ -79,6 +79,8 @@ if __name__ == '__main__':
                     args.set_vram_y,
                     args.copy_header
                 )
+        else:
+            parser.print_help()
 
     except CliException as e:
         print(e)
