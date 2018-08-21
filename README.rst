@@ -185,6 +185,8 @@ don't know why they used two nearly identical formats.
 Changelog
 ---------
 
+2.3.2	Fix copy-header offsets
+
 2.3.1	Add copy-header switch for TIM
 
 2.3	Unpack/repack ACE.BPB and ACE.BPH

@@ -24,7 +24,7 @@ import ac3es
 import struct
 from ac3es.exceptions import CliException, NotTimException
 
-VERSION = '2.3.1'
+VERSION = '2.3.2'
 
 
 def prompt_file_exists(filename):

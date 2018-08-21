@@ -115,10 +115,10 @@ class Tim:
             
             if self.bpp == 4:
                 self.n_colors = self.n_clut * 16
-                self.clut_data = self.stream.read(self.n_clut*32+4)
+                self.clut_data = self.stream.read(self.clut_size)
             else:
                 self.n_colors = self.n_clut * 256
-                self.clut_data = self.stream.read(self.n_clut*64+4)
+                self.clut_data = self.stream.read(self.clut_size)
 
             self.offsets['clut_header_end'] = self.stream.tell()
 
