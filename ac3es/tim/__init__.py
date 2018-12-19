@@ -14,26 +14,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from setuptools import setup, find_packages
-
-from ac3es.cli.parser import VERSION_NUMBER
-
-with open('README.rst') as f:
-    readme = f.read()
-
-with open('COPYING') as f:
-    license = f.read()
-
-setup(
-    name='ac3tools',
-    version=VERSION_NUMBER,
-    description='Various tools for manipulate Ace Combat 3 game files',
-    long_description=readme,
-    author='Gianluigi "Infrid" Cusimano',
-    author_email='infrid@infrid.com',
-    url='http://ac3es.infrid.com/',
-    license=license,
-    packages=find_packages(exclude=('tests', 'docs')),
-    install_requires=[],
-)
+from ac3es.tim.reader import TimReader

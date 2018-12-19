@@ -17,4 +17,4 @@
 import collections
 
 
-BpbChunk = collections.namedtuple('BpbChunk', ['header', 'offsets', 'chunks'])
+BPBChunk = collections.namedtuple('BpbChunk', ['header', 'offsets', 'chunks'])

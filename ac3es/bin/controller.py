@@ -20,7 +20,15 @@ import struct
 import pathlib
 
 
-class BinSplitter:
+class BinController:
+
+    def __init__(self):
+        self.stream = None
+        self.entries = None
+        self.file_names = None
+        self.file_size = None
+        self.num_entries = None
+
     def split(self, stream, dest_path, list_path):
         self.stream = stream
         self.entries = []
@@ -63,7 +71,7 @@ class BinSplitter:
             elif content[0:4] == b'Ulz\x1A':
                 extension = '.ulz'
 
-            dest_filename = str(entry['number']).zfill(len(str(self.num_entries)))  + extension
+            dest_filename = str(entry['number']).zfill(len(str(self.num_entries))) + extension
             out_file_path = str(dest_path.joinpath(dest_filename))
 
             self.file_names.append(out_file_path)

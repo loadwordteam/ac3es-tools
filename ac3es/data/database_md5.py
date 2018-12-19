@@ -15,8 +15,7 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class DatabaseMD5():
-
+class DatabaseMD5:
     header = (
         'DISK EXE ID',
         'DISK NO.',

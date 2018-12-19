@@ -1,0 +1,38 @@
+before_script:
+  - echo "BRANCH='${CI_COMMIT_REF_NAME}'\n" >> ac3es/cli/version.py
+  - echo "COMMIT_REF='${CI_COMMIT_SHA:0:8}'\n" >> ac3es/cli/version.py
+
+
+linux-build:
+  stage: build
+  image: python:3.7.1-stretch
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA:0:8}-linux-amd64"
+    paths:
+      - dist/ac3es
+  script:
+    - pip3 install pyinstaller -q
+    - pyinstaller ac3es.spec
+
+win32-build:
+  image: ubuntu:latest
+  stage: build
+  artifacts:
+    name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA:0:8}-windows-i386"
+    paths:
+      - dist/ac3es.exe
+  script:
+    # - dnf update -y
+    - dpkg --add-architecture i386
+    - apt-get update -y
+    - apt-get install wine-stable wine32 wget -y
+    - wget https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi
+    - export WINEARCH=win32
+    - wineboot -u
+    - wget  https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
+    - chmod +x winetricks
+    - sh winetricks win7
+    - wine msiexec /i python-3.4.2.msi /qb TARGETDIR=C:/Python342;
+    - wine C:/Python342/python.exe -m ensurepip --upgrade
+    - wine C:/Python342/python.exe -m pip install pyinstaller
+    - wine C:/Python342/scripts/pyinstaller.exe ac3es.spec

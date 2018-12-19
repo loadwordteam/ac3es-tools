@@ -17,15 +17,14 @@
 
 import pathlib
 import struct
-import os
 from ac3es.exceptions import BinDetectException
-from ac3es.types import BpbChunk
+from ac3es.bpb.types import BPBChunk
 
 
-class Bpb:
+class BpbController:
     def __init__(self, bpb=None, bph=None):
-        self.bpb = bpb
-        self.bph = bph
+        self.bpb = pathlib.Path(bpb)
+        self.bph = pathlib.Path(bph)
 
     def pack_all(self, root_dir, offset=0):
         # print('DIR', root_dir.resolve())
@@ -45,7 +44,7 @@ class Bpb:
                     chunks.append(f.read())
 
         header = struct.pack('<I', len(chunks))
-        start_offset = 4 + len(chunks)*4
+        start_offset = 4 + len(chunks) * 4
         offsets = []
         current_offset = 0
         for entry in chunks:
@@ -54,14 +53,14 @@ class Bpb:
             )
             current_offset += len(entry)
 
-        return BpbChunk(header, offsets, chunks)
+        return BPBChunk(header, offsets, chunks)
 
     def pack(self, source_path):
         directory = pathlib.Path(source_path)
         if not directory.is_dir():
             raise Exception('{} is not a directory'.format(source_path))
 
-        with open(self.bpb, 'wb') as bpb, open(self.bph, 'wb') as bph:
+        with self.bpb.open('wb') as bpb, self.bph.open('wb') as bph:
             bph.write(b'AC3E\x03\x00\x00\x00\x27\x04\x00\x00\x84\x14\x00\x00')
             pieces = self.pack_all(directory)
             bph.write(struct.pack('<I', len(pieces.chunks)))
@@ -77,43 +76,40 @@ class Bpb:
 
         bpb.seek(start_offset)
         num_entries = int.from_bytes(bpb.read(4), byteorder='little')
-        offsets = []
+
         try:
             if 0 < num_entries < 512:
                 offsets = []
                 for i in range(num_entries):
                     offsets.append(int.from_bytes(bpb.read(4), byteorder='little'))
-                is_sorted = all(offsets[i] < offsets[i+1] for i in range(len(offsets)-1))
+                is_sorted = all(offsets[i] < offsets[i + 1] for i in range(len(offsets) - 1))
                 if not is_sorted:
                     raise BinDetectException('the list is not ordered ')
                 if start_offset + offsets[-1] > start_offset + size:
                     raise BinDetectException('chunk too big')
 
-                #print(level, 'dir', num_entries, start_offset, size)
-
                 for idx, chunk_offset in enumerate(offsets):
                     chunk_size = None
                     try:
-                        chunk_size = offsets[idx+1] - chunk_offset
+                        chunk_size = offsets[idx + 1] - chunk_offset
                     except IndexError:
                         chunk_size = size - chunk_offset
 
                     self.unpack_all(
                         dest_dir / pathlib.Path(str(idx).zfill(4)),
                         bpb,
-                        chunk_offset+start_offset,
+                        chunk_offset + start_offset,
                         chunk_size
                     )
 
                 return
-        except BinDetectException as e:
+        except BinDetectException:
             pass
-            #print('-------------', e)
 
         bpb.seek(start_offset)
         content = bpb.read(size)
 
-        extension = '.dat'
+        extension = '.bin'
         if content[0:4] == b'\x10\x00\x00\x00':
             extension = '.tim'
         elif content[0:4] == b'Ulz\x1A':
@@ -127,16 +123,17 @@ class Bpb:
             part.write(content)
 
         print(filename)
-        #print(level, 'chunk', start_offset, size, dest_dir)
-
 
     def unpack(self, dest_path):
-        if not os.path.isfile(self.bpb) or not os.path.isfile(self.bph):
-            raise Exception('cannot open bph or bpb')
+        if not self.bpb.is_file():
+            raise Exception('BPB {} is not a file or is inaccessible'.format(self.bpb.resolve()))
+
+        if not self.bph.is_file():
+            raise Exception('BPH {} is not a file or is inaccessible'.format(self.bpb.resolve()))
 
         dest_path = pathlib.Path(dest_path)
 
-        with open(self.bpb, 'rb') as bpb, open(self.bph, 'rb') as bph:
+        with self.bpb.open('rb') as bpb, self.bph.open('rb') as bph:
 
             bph.read(16)
             num_entries = int.from_bytes(bph.read(4), byteorder='little')
@@ -145,6 +142,6 @@ class Bpb:
             for idx in range(num_entries):
                 raw_entry = bph.read(8)
                 size = int.from_bytes(raw_entry[:3], byteorder='little') << 2
-                position = int.from_bytes(raw_entry[4:], byteorder='little')*0x800
+                position = int.from_bytes(raw_entry[4:], byteorder='little') * 0x800
                 current_entry = dest_path / pathlib.Path(str(idx).zfill(4))
                 self.unpack_all(current_entry, bpb, position, size, '')
