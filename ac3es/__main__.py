@@ -14,11 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from ac3es.exceptions import CliException
-import ac3es
 import ac3es.cli
-
+from ac3es.exceptions import CliException
 
 if __name__ == '__main__':
     parser = ac3es.cli.command_parser()
@@ -27,7 +24,7 @@ if __name__ == '__main__':
     try:
         if args.command == 'ulz':
             if args.decompress:
-                ac3es.cli.decompress_file(
+                ac3es.cli.ulz.decompress_file(
                     args.decompress,
                     args.output_file,
                     args.parents,
@@ -35,7 +32,7 @@ if __name__ == '__main__':
                     args.keep
                 )
             elif args.compress:
-                ac3es.cli.compress_file(
+                ac3es.cli.ulz.compress_file(
                     args.compress,
                     args.output_file,
                     args.ulz_type,
@@ -47,30 +44,28 @@ if __name__ == '__main__':
                 )
 
         elif args.command == 'info':
-            info = ac3es.InfoFile()
-            for x in args.FILES:
-                info.detect(x)
+            ac3es.cli.info.guess(args.FILES)
         elif args.command == 'bin':
             if args.split:
-                ac3es.cli.bin_file_split(
+                ac3es.cli.bin.split(
                     args.split,
                     args.out_list,
                     args.out_directory
                 )
             elif args.merge:
-                ac3es.cli.bin_file_merge(
+                ac3es.cli.bin.merge(
                     args.merge,
                     args.out_bin,
                     args.verbose
                 )
         elif args.command == 'bpb':
             if args.pack is not None:
-                ac3es.cli.pack_bpb(args.bpb, args.bph, args.pack)
+                ac3es.cli.bpb.pack(args.bpb, args.bph, args.pack)
             elif args.unpack is not None:
-                ac3es.cli.unpack_bpb(args.bpb, args.bph, args.unpack)
+                ac3es.cli.bpb.unpack(args.bpb, args.bph, args.unpack)
         elif args.command == 'tim':
             for tim_file in args.FILES:
-                ac3es.cli.copy_tim_data(
+                ac3es.cli.tim.copy_tim_data(
                     args.source_tim,
                     tim_file,
                     args.copy_clut,
@@ -84,4 +79,4 @@ if __name__ == '__main__':
 
     except CliException as e:
         print(e)
-        exit(-1)    
+        exit(-1)

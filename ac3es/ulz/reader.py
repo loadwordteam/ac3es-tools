@@ -18,6 +18,8 @@
 
 import io
 
+from ac3es.cli.helpers import b2uint
+
 
 class UlzReader:
     """
@@ -39,16 +41,16 @@ class UlzReader:
         self.u_type = self.ulz_stream.read(1)
         if self.u_type != b'\x00' and self.u_type != b'\x02':
             raise Exception('Format "{}" not supported'.format(self.u_type))
-        self.u_type = self.b2uint(self.u_type)
+        self.u_type = b2uint(self.u_type)
 
-        self.uncompressed_size = self.b2uint(raw_uncompressed_size)
+        self.uncompressed_size = b2uint(raw_uncompressed_size)
 
         raw_uncompressed_offset = self.ulz_stream.read(3)
         self.nbits = self.ulz_stream.read(1)
-        self.nbits = self.b2uint(self.nbits)
-        self.uncompressed_offset = self.b2uint(raw_uncompressed_offset)
+        self.nbits = b2uint(self.nbits)
+        self.uncompressed_offset = b2uint(raw_uncompressed_offset)
         raw_compressed_offset = self.ulz_stream.read(4)
-        self.compressed_offset = self.b2uint(raw_compressed_offset[:-1])
+        self.compressed_offset = b2uint(raw_compressed_offset[:-1])
 
         self.mask_run = ((1 << self.nbits) + 0xffff) & 0xFFFF
 
@@ -119,7 +121,7 @@ class UlzReader:
                 if self.is_compressed_flag():
                     self.count_compressed += 1
                     self.ulz_stream.seek(c_seek, 0)
-                    data = self.b2uint(self.ulz_stream.read(2))
+                    data = b2uint(self.ulz_stream.read(2))
                     c_seek = self.ulz_stream.tell()
 
                     jump = data & self.mask_run
@@ -170,9 +172,3 @@ class UlzReader:
             self.ulz_stream.close()
             decompressed_data = out_file.getvalue()
         return decompressed_data
-
-    def b2uint(self, number):
-        """Simple function for convert the bytes in little endian to
-        integer"""
-
-        return int.from_bytes(number, byteorder='little', signed=False)

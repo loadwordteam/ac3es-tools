@@ -15,25 +15,10 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from setuptools import setup, find_packages
+from ac3es.info import InfoFile
 
-from ac3es.cli.parser import VERSION_NUMBER
 
-with open('README.rst') as f:
-    readme = f.read()
-
-with open('COPYING') as f:
-    license = f.read()
-
-setup(
-    name='ac3tools',
-    version=VERSION_NUMBER,
-    description='Various tools for manipulate Ace Combat 3 game files',
-    long_description=readme,
-    author='Gianluigi "Infrid" Cusimano',
-    author_email='infrid@infrid.com',
-    url='http://ac3es.infrid.com/',
-    license=license,
-    packages=find_packages(exclude=('tests', 'docs')),
-    install_requires=[],
-)
+def guess(file_list):
+    info = InfoFile()
+    for x in file_list:
+        info.detect(x)

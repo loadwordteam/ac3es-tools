@@ -19,7 +19,7 @@ import os
 from ac3es.exceptions import NotTimException
 
 
-class Tim:
+class TimReader:
     signature = b'\x10\x00\x00\x00'
 
     BPP_TYPES = {
@@ -96,7 +96,7 @@ class Tim:
         if self.bpp is None:
             raise NotTimException('{} Invalid BPP {}'.format(self.original_path, str(self.bpp)))
 
-        self.clut_size = int.from_bytes(self.stream.read(4), byteorder='little')
+        self.clut_size = int.from_bytes(self.stream.read(4), byteorder='little') - 4
 
         if self.bpp == 4 or self.bpp == 8:
             self.offsets['clut_header_start'] = self.stream.tell()

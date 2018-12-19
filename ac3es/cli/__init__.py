@@ -14,10 +14,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
+from ac3es.cli import bin
+from ac3es.cli import bpb
+from ac3es.cli import helpers
+from ac3es.cli import info
+from ac3es.cli.parser import command_parser
+from ac3es.cli import tim
+from ac3es.cli import ulz
 
-from ac3es.ulz import *
-from ac3es.info import InfoFile
-from ac3es.bin_splitter import BinSplitter
-from ac3es.tim import Tim
-from ac3es.bpb import Bpb
-import ac3es.cli as cli

@@ -15,25 +15,28 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from setuptools import setup, find_packages
+import os
+from ac3es.exceptions import CliException
+from ac3es.bpb import BpbController
 
-from ac3es.cli.parser import VERSION_NUMBER
 
-with open('README.rst') as f:
-    readme = f.read()
+def unpack(bpb, bph, dest_dir):
+    if not os.path.isfile(bpb):
+        raise CliException('Cannot access to {} for BPB'.format(bpb))
 
-with open('COPYING') as f:
-    license = f.read()
+    if not os.path.isfile(bph):
+        raise CliException('Cannot access to {} for BPH'.format(bph))
 
-setup(
-    name='ac3tools',
-    version=VERSION_NUMBER,
-    description='Various tools for manipulate Ace Combat 3 game files',
-    long_description=readme,
-    author='Gianluigi "Infrid" Cusimano',
-    author_email='infrid@infrid.com',
-    url='http://ac3es.infrid.com/',
-    license=license,
-    packages=find_packages(exclude=('tests', 'docs')),
-    install_requires=[],
-)
+    if not os.path.isdir(dest_dir):
+        os.mkdir(dest_dir)
+
+    controller = BpbController(bpb, bph)
+    controller.unpack(dest_dir)
+
+
+def pack(bpb, bph, source_dir):
+    if not os.path.isdir(source_dir):
+        raise CliException('Cannot access to {} as source'.format(source_dir))
+
+    controller = BpbController(bpb, bph)
+    controller.pack(source_dir)
