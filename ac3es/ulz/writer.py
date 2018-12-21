@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
-from ac3es.cli.helpers import grouper
+from ac3es.cli import helpers
 from ac3es.ulz.lz77 import SlidingWindow
 import array
 import struct
@@ -175,14 +175,14 @@ class UlzWriter:
                 bit_flags.append(True)
 
         if self.ulz_type == 2:
-            for chunk in grouper(32, bit_flags, False):
+            for chunk in helpers.grouper(32, bit_flags, False):
                 flag_number = 0
                 for x in chunk:
                     flag_number = (flag_number << 1) | (1 if x else 0)
                 self.flags += struct.pack('<I', flag_number)
 
         elif self.ulz_type == 0:
-            for chunk in grouper(31, bit_flags, False):
+            for chunk in helpers.grouper(31, bit_flags, False):
 
                 flag_number = 0
                 # last bit always true

@@ -64,7 +64,7 @@ class TimReader:
             'file_location': file_location.lower(),
             'bpb_location': bpb_location,
             'filetype': 'tim',
-            # 'size': os.path.getsize(path),
+            'size': os.path.getsize(file_location),
             'bpp': self.bpp,
             # 'md5': utils.md5_for_file(path),
             'vram_x': self.vram_x,
@@ -153,3 +153,11 @@ class TimReader:
                 self.img_width *= 1.5
         
         self.offsets['header_end'] = self.stream.tell()
+
+    @staticmethod
+    def get_tim_info(tim_path):
+        stats = {}
+        with open(tim_path, 'rb') as tim:
+            tim_file = TimReader(tim)
+            stats = tim_file.info(tim_path)
+        return stats

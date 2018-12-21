@@ -15,3 +15,4 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 from ac3es.bpb.controller import BpbController
+from ac3es.bpb.cli import CliBpb

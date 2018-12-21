@@ -14,11 +14,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
+class BaseCliCommand:
+    def get_parser(selfs, subparsers):
+        pass
 
-from ac3es.info import InfoFile
-
-
-def guess(file_list):
-    info = InfoFile()
-    for x in file_list:
-        info.detect(x)
+    def run_cmd(self, args):
+        pass

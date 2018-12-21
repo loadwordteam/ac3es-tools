@@ -19,6 +19,8 @@ import os
 import struct
 import pathlib
 
+from ac3es.exceptions import CliException
+
 
 class BinController:
 
@@ -55,8 +57,8 @@ class BinController:
                 )
             })
 
-    def extract_all(self, dest_directoty_path, list_path=None):
-        dest_path = pathlib.Path(dest_directoty_path)
+    def extract_all(self, dest_directory_path, list_path=None):
+        dest_path = pathlib.Path(dest_directory_path)
         for idx, entry in enumerate(self.entries):
             try:
                 size = self.entries[idx+1]['offset'] - entry['offset']
@@ -90,8 +92,7 @@ class BinController:
         for filename in content_list:
             real_path = str(pathlib.Path(filename).resolve())
             if not os.path.isfile(real_path):
-                print('file', real_path, 'does not exists')
-                exit()
+                raise CliException('file {} does not exists'.format(real_path))
             with open(real_path, 'rb') as entry_file:
                 entry = entry_file.read()
                 entry = entry + b'\x00' * (len(entry) % 4)

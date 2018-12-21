@@ -15,68 +15,74 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 import ac3es.cli
+import ac3es.cli.helpers
+from ac3es.cli import BaseCliCommand
 from ac3es.exceptions import CliException
 
+from ac3es.bin import CliBin
+from ac3es.bpb import CliBpb
+from ac3es.info import CliInfo
+from ac3es.tim import CliTim
+from ac3es.ulz import CliUlz
+
+import sys
+import os
+import argparse
+
 if __name__ == '__main__':
-    parser = ac3es.cli.command_parser()
+
+    if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]):
+        ac3es.cli.helpers.quick_ulz(sys.argv[1])
+        sys.exit(0)
+
+    epilog = """Example:
+
+    Compress an image and put the output into the same directory
+      {0} ulz --compress image.tim --ulz-type=2 --level=1
+
+    or define another destination
+      {0} ulz --compress jap_0002.tim --ulz-type=2 --level=1 --output-file=mycompress.ulz
+
+    Get what parameters use from the original file
+      {0} info BPB/0386/0001/0000.ulz
+
+    Work on bin containers
+      {0} bin --split=BPB/0114/0007.bin --out-directory=splitted/0007 --out-list=splitted/0007.txt
+      {0} bin --merge=splitted/0007.txt --out-bin=mod_0007.bin
+
+    More parameters are available, just type help for the sub command
+      {0} ulz --help
+      {0} info --help
+      {0} bin --help
+      {0} tim --help
+      {0} bpb --help
+
+    Report bugs to: infrid@infrid.com
+    AC3ES Version {1}
+    Homepage: <http://ac3es.infrid.com/>
+    """.format(sys.argv[0], ac3es.cli.helpers.get_version())
+
+    parser = argparse.ArgumentParser(
+        epilog=epilog,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    subparsers = parser.add_subparsers(help='Commands', dest='command')
+
+    commands = {}
+
+    for cmd in BaseCliCommand.__subclasses__():
+        single_command = cmd()
+        subparsers = single_command.get_parser(subparsers)
+        commands[single_command.name] = single_command
+
     args = parser.parse_args()
 
     try:
-        if args.command == 'ulz':
-            if args.decompress:
-                ac3es.cli.ulz.decompress_file(
-                    args.decompress,
-                    args.output_file,
-                    args.parents,
-                    False,
-                    args.keep
-                )
-            elif args.compress:
-                ac3es.cli.ulz.compress_file(
-                    args.compress,
-                    args.output_file,
-                    args.ulz_type,
-                    args.level,
-                    args.store_only,
-                    args.parents,
-                    args.like_file,
-                    args.keep
-                )
-
-        elif args.command == 'info':
-            ac3es.cli.info.guess(args.FILES)
-        elif args.command == 'bin':
-            if args.split:
-                ac3es.cli.bin.split(
-                    args.split,
-                    args.out_list,
-                    args.out_directory
-                )
-            elif args.merge:
-                ac3es.cli.bin.merge(
-                    args.merge,
-                    args.out_bin,
-                    args.verbose
-                )
-        elif args.command == 'bpb':
-            if args.pack is not None:
-                ac3es.cli.bpb.pack(args.bpb, args.bph, args.pack)
-            elif args.unpack is not None:
-                ac3es.cli.bpb.unpack(args.bpb, args.bph, args.unpack)
-        elif args.command == 'tim':
-            for tim_file in args.FILES:
-                ac3es.cli.tim.copy_tim_data(
-                    args.source_tim,
-                    tim_file,
-                    args.copy_clut,
-                    args.copy_vram,
-                    args.set_vram_x,
-                    args.set_vram_y,
-                    args.copy_header
-                )
+        if commands.get(args.command, None):
+            commands.get(args.command).run_cmd(args)
         else:
             parser.print_help()
-
     except CliException as e:
         print(e)
         exit(-1)

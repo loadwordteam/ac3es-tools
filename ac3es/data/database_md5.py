@@ -98,5 +98,5 @@ class DatabaseMD5:
         for row in self.database:
             for col in row:
                 if col == md5:
-                    return zip(self.header, row)
+                    return dict(zip(self.header, row))
         return None

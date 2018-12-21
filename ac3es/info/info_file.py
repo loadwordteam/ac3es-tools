@@ -15,8 +15,8 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 from ac3es.cli.helpers import md5_for_file
-from ac3es.cli.tim import get_tim_info
-from ac3es.cli.ulz import get_ulz_info
+from ac3es.tim import TimReader
+from ac3es.ulz.helpers import get_ulz_info
 from ac3es.data.database_md5 import DatabaseMD5
 from ac3es.exceptions import NotTimException
 
@@ -29,19 +29,13 @@ class InfoFile:
 
     def detect(self, path):
         if path[-3:] == 'ulz':
-            get_ulz_info(path)
-            exit()
+            return get_ulz_info(path)
 
         try:
-            get_tim_info(path)
-            exit()
+            return TimReader.get_tim_info(path)
         except NotTimException as e:
             pass
 
         hash_value = md5_for_file(path)
-        report = self.db_md5.find(hash_value)
-        if report:
-            print(path, hash_value, sep='\t')
-            print('-' * 64)
-            for key, value in report:
-                print(key, value, sep='\t')
+        return self.db_md5.find(hash_value)
+

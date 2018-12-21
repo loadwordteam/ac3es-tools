@@ -15,3 +15,5 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 from ac3es.tim.reader import TimReader
+from ac3es.tim.writer import copy_tim_data
+from ac3es.tim.cli import CliTim

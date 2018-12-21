@@ -15,3 +15,4 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 from ac3es.bin.controller import BinController
+from ac3es.bin.cli import CliBin

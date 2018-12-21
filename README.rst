@@ -185,17 +185,42 @@ don't know why they used two nearly identical formats.
 Changelog
 ---------
 
-2.3.2	Fix copy-header offsets
+2.5.0
+^^^^^
 
-2.3.1	Add copy-header switch for TIM
+- Shortcut -t in ulz compress
+- Unpack bpb now returns the offsets
+- You can recompress ulz files in place
 
-2.3	Unpack/repack ACE.BPB and ACE.BPH
+2.3.2
+^^^^^
 
-2.2	Edit TIM header and CLUT data
+Fix copy-header offsets
 
-2.1	Split and merge bin containers
+2.3.1
+^^^^^
 
-2.0	Ulz type 0 compression is finally working
+Add copy-header switch for TIM
+
+2.3
+^^^
+
+Unpack/repack ACE.BPB and ACE.BPH
+
+2.2
+^^^
+
+Edit TIM header and CLUT data
+
+2.1
+^^^
+
+Split and merge bin containers
+
+2.0
+^^^
+
+Ulz type 0 compression is finally working
 
 Contributors
 ------------

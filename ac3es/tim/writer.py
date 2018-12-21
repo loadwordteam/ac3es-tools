@@ -79,11 +79,3 @@ def copy_tim_data(source_path, dest_path, replace_clut=False, replace_vram=False
     except NotTimException as e:
         raise CliException(str(e))
 
-
-def get_tim_info(tim_path):
-    with open(tim_path, 'rb') as tim:
-        tim_file = TimReader(tim)
-        stats = tim_file.info(tim_path)
-        keys = stats.keys()
-        for key in sorted(keys):
-            print(key, stats[key], sep='\t')

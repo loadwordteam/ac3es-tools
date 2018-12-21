@@ -91,8 +91,7 @@ class SlidingWindow:
             if found >= 0:
                 run = limit
                 # We look if our search_buffer edge can compress the look_ahead_buffer
-                if self.search_buffer.endswith(
-                        token) and found == self.search_buffer.rfind(token):
+                if self.search_buffer.endswith(token) and found == self.search_buffer.rfind(token):
                     ring_token = collections.deque(token)
                     extra_run = 0
                     for char in self.look_ahead_buffer:

@@ -20,14 +20,12 @@ import struct
 from ac3es.exceptions import BinDetectException
 from ac3es.bpb.types import BPBChunk
 
-
 class BpbController:
     def __init__(self, bpb=None, bph=None):
         self.bpb = pathlib.Path(bpb)
         self.bph = pathlib.Path(bph)
 
-    def pack_all(self, root_dir, offset=0):
-        # print('DIR', root_dir.resolve())
+    def pack_all(self, root_dir):
         chunks = []
         for entry in sorted(root_dir.iterdir()):
             if entry.name.startswith('.'):
@@ -39,7 +37,6 @@ class BpbController:
                     piece.header + b''.join(piece.offsets) + b''.join(piece.chunks)
                 )
             else:
-                # print('FILE', entry.resolve())
                 with entry.open('rb') as f:
                     chunks.append(f.read())
 
@@ -122,7 +119,7 @@ class BpbController:
         with filename.open('wb') as part:
             part.write(content)
 
-        print(filename)
+        print("\tBPB UNPACK {} {}".format(start_offset, filename))
 
     def unpack(self, dest_path):
         if not self.bpb.is_file():
@@ -143,5 +140,6 @@ class BpbController:
                 raw_entry = bph.read(8)
                 size = int.from_bytes(raw_entry[:3], byteorder='little') << 2
                 position = int.from_bytes(raw_entry[4:], byteorder='little') * 0x800
+                print("CHUNK {}".format(position))
                 current_entry = dest_path / pathlib.Path(str(idx).zfill(4))
                 self.unpack_all(current_entry, bpb, position, size, '')

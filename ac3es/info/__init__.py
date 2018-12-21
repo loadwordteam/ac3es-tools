@@ -15,3 +15,4 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 from ac3es.info.info_file import InfoFile
+from ac3es.info.cli import CliInfo

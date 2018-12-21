@@ -17,7 +17,7 @@
 
 from setuptools import setup, find_packages
 
-from ac3es.cli.parser import VERSION_NUMBER
+import ac3es.cli.helpers
 
 with open('README.rst') as f:
     readme = f.read()
@@ -26,14 +26,15 @@ with open('COPYING') as f:
     license = f.read()
 
 setup(
-    name='ac3tools',
-    version=VERSION_NUMBER,
+    name='ac3es-tools',
+    version=ac3es.cli.helpers.get_version(),
     description='Various tools for manipulate Ace Combat 3 game files',
     long_description=readme,
     author='Gianluigi "Infrid" Cusimano',
     author_email='infrid@infrid.com',
     url='http://ac3es.infrid.com/',
     license=license,
-    packages=find_packages(exclude=('tests', 'docs')),
+    package_dir={'': 'ac3es'},
+    packages=find_packages(where='ac3es', exclude=('tests', 'docs')),
     install_requires=[],
 )
