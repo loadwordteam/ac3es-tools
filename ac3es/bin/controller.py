@@ -90,7 +90,11 @@ class BinController:
         chunks = []
 
         for filename in content_list:
-            real_path = str(pathlib.Path(filename).resolve())
+            if os.sep == '/' and filename.find('\\') >= 0:
+                real_path = str(pathlib.Path(pathlib.PureWindowsPath(filename)).resolve())
+            else:
+                real_path = str(pathlib.Path(filename).resolve())
+
             if not os.path.isfile(real_path):
                 raise CliException('file {} does not exists'.format(real_path))
             with open(real_path, 'rb') as entry_file:
