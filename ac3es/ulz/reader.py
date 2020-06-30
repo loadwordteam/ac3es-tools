@@ -165,7 +165,7 @@ class UlzReader:
 
                         if out_file.tell() >= self.uncompressed_size:
                             tmp_buff = b''
-                            exit()
+                            sys.exit(-1)
                             break
 
                         tmp_buff += found_data

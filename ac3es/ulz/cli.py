@@ -148,7 +148,7 @@ class CliUlz(BaseCliCommand):
         if create_ulz_data:
             file_path = pathlib.Path(file_path.parent, ulz_data_name, file_path.stem)
 
-        file_path = file_path.with_suffix(data_type)
+        file_path = file_path.resolve() if dest_filename else file_path.with_suffix(data_type)
 
         if create_parents or create_ulz_data:
             file_path.parent.mkdir(0o644, True, True)

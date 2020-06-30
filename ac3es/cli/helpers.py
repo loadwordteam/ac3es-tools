@@ -66,7 +66,7 @@ def prompt_file_exists(filename):
             choice = input().lower()
             if choice == 'n' or choice == 'no':
                 print('abort...')
-                exit()
+                sys.exit(-1)
             elif choice == 'y' or choice == 'yes':
                 break
             else:
