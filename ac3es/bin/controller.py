@@ -90,7 +90,7 @@ class BinController:
         chunks = []
 
         for filename in content_list:
-            if os.sep == '/' and filename.find('\\') >= 0:
+            if os.sep == '/' and str(filename).find('\\') >= 0:
                 real_path = str(pathlib.Path(pathlib.PureWindowsPath(filename)).resolve())
             else:
                 real_path = str(pathlib.Path(filename).resolve())
