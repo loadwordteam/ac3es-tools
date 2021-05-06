@@ -1,3 +1,7 @@
+.. image:: https://quay.io/repository/infrid/ac3es-tools/status
+   :target: https://quay.io/repository/infrid/ac3es-tools
+   :alt: Docker Repository on Quay
+
 AC3ES Tools
 ===========
 
