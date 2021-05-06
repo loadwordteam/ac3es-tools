@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 #  This file is part of AC3ES Tools.
 #
 #  AC3ES Tools is free software: you can redistribute it and/or modify
@@ -14,6 +15,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
-from ac3es.bin.split import split_file
-from ac3es.bin.merge import merge_files
-from ac3es.bin.cli import CliBin
+from .test import TestBin

@@ -1,12 +1,6 @@
-before_script:
-  - echo "BRANCH='${CI_COMMIT_REF_NAME}'\n" >> ac3es/cli/version.py
-  - echo "COMMIT_REF='${CI_COMMIT_SHA:0:8}'\n" >> ac3es/cli/version.py
-  - echo "COMMIT_TAG='${CI_COMMIT_TAG}'\n" >> ac3es/cli/version.py
-
-
 linux-amd64:
   stage: build
-  image: python:3.7.1-stretch
+  image: python:3.9.5-buster
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA:0:8}-linux-amd64"
     paths:
@@ -19,7 +13,7 @@ linux-amd64:
     - mv dist ac3es-tools-linux-amd64
 
 windows-amd64:
-  image: ubuntu:18.04
+  image: quay.io/infrid/python3-wine-staging:latest
   stage: build
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA:0:8}-windows-i386"
@@ -28,30 +22,6 @@ windows-amd64:
   variables:
     WINEARCH: win64
   script:
-    - apt-get update
-    - apt-get upgrade -y
-    - dpkg --add-architecture i386 
-    - apt-get update
-    - apt-get install software-properties-common unzip curl wget libsm6:i386 -y
-    - dpkg --add-architecture i386
-    - apt-get update
-    - wget -qO - https://dl.winehq.org/wine-builds/winehq.key | apt-key add -
-    - apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
-    - add-apt-repository ppa:cybermax-dexter/sdl2-backport
-    - apt-get update
-    - apt install --install-recommends winehq-stable -y
-    - apt-get install xvfb fonts-wine -y
-    - wget https://www.python.org/ftp/python/3.6.8/python-3.6.8-amd64.exe
-    - wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
-    - chmod +x winetricks
-    - sh winetricks win7
-    - wget https://aka.ms/vs/16/release/vc_redist.x64.exe
-    - xvfb-run wine vc_redist.x64.exe /q /norestart
-    - wget https://aka.ms/vs/16/release/vc_redist.x86.exe
-    - xvfb-run wine vc_redist.x86.exe /q /norestart
-    - xvfb-run wine python-3.6.8-amd64.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 TargetDir=c:\Python3
-    - wine C:/Python3/python.exe -m ensurepip --upgrade
-    - wine C:/Python3/python.exe -m pip install pyinstaller
     - wine C:/Python3/python.exe -m PyInstaller -F ac3es.spec
     - cp README.rst dist/
     - cp COPYING dist/

@@ -16,29 +16,10 @@
 
 import os
 import hashlib
-import pathlib
 import sys
 
 from itertools import zip_longest
-from ac3es.ulz import CliUlz
-from ac3es.cli import version
-
 from ac3es.exceptions import CliException
-
-
-def get_version():
-    version_number = '2.5.0'
-
-    if version.COMMIT_TAG:
-        version_number = version.COMMIT_TAG
-
-    if version.BRANCH is not None and version.BRANCH != 'master':
-        version_number += ' ' + version.BRANCH
-
-    if version.COMMIT_REF:
-        version_number += ' ref' + version.COMMIT_REF
-
-    return version_number
 
 
 def md5_for_file(path, block_size=256 * 128):
