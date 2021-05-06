@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 #  This file is part of AC3ES Tools.
 #
 #  AC3ES Tools is free software: you can redistribute it and/or modify
@@ -14,7 +15,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
-import collections
-
-
-BPBChunk = collections.namedtuple('BpbChunk', ['header', 'offsets', 'chunks'])
+from .test import TestBPB

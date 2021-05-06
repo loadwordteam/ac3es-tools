@@ -10,7 +10,7 @@ full working Ulz compressor/decompressor!
 Requirements
 ------------
 
-Now you need Python >= 3.4
+Now you need Python >= 3.9
 
 Usage
 -----
@@ -184,6 +184,12 @@ don't know why they used two nearly identical formats.
 
 Changelog
 ---------
+
+3.0
+^^^^^
+
+- Tons of bugfix
+- Total refactor
 
 2.5.0
 ^^^^^

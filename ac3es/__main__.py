@@ -18,22 +18,17 @@ import ac3es.cli
 import ac3es.cli.helpers
 from ac3es.cli import BaseCliCommand
 from ac3es.exceptions import CliException
+import sys
+import argparse
 
+# we need to import the classes even if we don't use them directly
 from ac3es.bin import CliBin
 from ac3es.bpb import CliBpb
 from ac3es.info import CliInfo
 from ac3es.tim import CliTim
 from ac3es.ulz import CliUlz
 
-import sys
-import os
-import argparse
-
 if __name__ == '__main__':
-
-    if len(sys.argv) == 2 and os.path.isfile(sys.argv[1]):
-        ac3es.cli.helpers.quick_ulz(sys.argv[1])
-        sys.exit(0)
 
     epilog = """Example:
 
@@ -60,7 +55,7 @@ if __name__ == '__main__':
     Report bugs to: infrid@infrid.com
     AC3ES Version {1}
     Homepage: <http://ac3es.infrid.com/>
-    """.format(sys.argv[0], ac3es.cli.helpers.get_version())
+    """.format(sys.argv[0], ac3es.cli.VERSION)
 
     parser = argparse.ArgumentParser(
         epilog=epilog,
@@ -68,7 +63,6 @@ if __name__ == '__main__':
     )
 
     subparsers = parser.add_subparsers(help='Commands', dest='command')
-
     commands = {}
 
     for cmd in BaseCliCommand.__subclasses__():
@@ -77,12 +71,14 @@ if __name__ == '__main__':
         commands[single_command.name] = single_command
 
     args = parser.parse_args()
+    print(BaseCliCommand.__subclasses__())
 
     try:
         if commands.get(args.command, None):
             commands.get(args.command).run_cmd(args)
         else:
             parser.print_help()
+
     except CliException as e:
         print(e)
         exit(-1)
