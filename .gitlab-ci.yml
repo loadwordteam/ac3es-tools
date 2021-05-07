@@ -8,7 +8,7 @@ linux-amd64:
   script:
     - pip3 install pyinstaller -q
     - pyinstaller ac3es.spec
-    - cp README.rst dist/
+    - cp README.md dist/
     - cp COPYING dist/
     - mv dist ac3es-tools-linux-amd64
 
@@ -23,6 +23,6 @@ windows-amd64:
     WINEARCH: win64
   script:
     - wine C:/Python3/python.exe -m PyInstaller -F ac3es.spec
-    - cp README.rst dist/
+    - cp README.md dist/
     - cp COPYING dist/
     - mv dist ac3es-tools-win-amd64
