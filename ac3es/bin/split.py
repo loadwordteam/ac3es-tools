@@ -76,7 +76,7 @@ def read_index(stream: typing.BinaryIO) -> typing.Tuple:
     for _ in range(num_entries):
         offset = int.from_bytes(stream.read(4), byteorder='little')
 
-        if prev_offset != None and (prev_offset == offset or prev_offset > offset):
+        if prev_offset is not None and (prev_offset == offset or prev_offset > offset):
             raise BinDetectException(f'Index from bin is incorrect, offsets are not monotonic {prev_offset} {offset}')
         else:
             prev_offset = offset

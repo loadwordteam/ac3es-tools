@@ -16,4 +16,5 @@
 
 from ac3es.cli.baseclicommand import BaseCliCommand
 from ac3es.cli import helpers
-VERSION='3.0'
+
+VERSION = '3.0'

@@ -14,6 +14,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
-BRANCH=None
-COMMIT_REF=None
-COMMIT_TAG=None
+BRANCH = None
+COMMIT_REF = None
+COMMIT_TAG = None

@@ -24,7 +24,6 @@ from ac3es.tim import TimReader
 
 def copy_tim_data(source_path, dest_path, replace_clut=False, replace_vram=False, vram_x=None, vram_y=None,
                   replace_header=False):
-
     if pathlib.Path(source_path).resolve() == pathlib.Path(dest_path).resolve():
         raise CliException('cannot operate on the same file')
 
@@ -78,4 +77,3 @@ def copy_tim_data(source_path, dest_path, replace_clut=False, replace_vram=False
                 dest_stream.write(struct.pack('<H', vram_y))
     except NotTimException as e:
         raise CliException(str(e))
-

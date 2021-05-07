@@ -94,4 +94,3 @@ class CliBin(BaseCliCommand):
                 args.out_bin,
                 args.verbose
             )
-

@@ -58,7 +58,7 @@ class TimReader:
                 ext_pos = file_location.rfind('.')
                 if ext_pos == -1:
                     ext_pos = len(file_location)
-                bpb_location = file_location[file_location.find('bpb')+3:ext_pos]
+                bpb_location = file_location[file_location.find('bpb') + 3:ext_pos]
 
         return collections.OrderedDict({
             'file_location': file_location.lower(),
@@ -112,7 +112,7 @@ class TimReader:
             self.n_clut = int.from_bytes(self.stream.read(2), byteorder='little')
 
             self.offsets['clut_data'] = self.stream.tell()
-            
+
             if self.bpp == 4:
                 self.n_colors = self.n_clut * 16
                 self.clut_data = self.stream.read(self.clut_size)
@@ -151,7 +151,7 @@ class TimReader:
 
             if self.bpp == 24:
                 self.img_width *= 1.5
-        
+
         self.offsets['header_end'] = self.stream.tell()
 
     @staticmethod

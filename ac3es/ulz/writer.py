@@ -21,7 +21,6 @@ import logging
 
 
 class UlzWriter:
-
     signature = b'\x55\x6c\x7a\x1a'
     ulz_type = None
     nbits = None
@@ -132,11 +131,7 @@ class UlzWriter:
         on nbits value.
         """
 
-        data = (
-            (
-                (run-3) << self.nbits
-            ) | (jump-1)
-        ) & 0xFFFF
+        data = (((run - 3) << self.nbits) | (jump - 1)) & 0xFFFF
         return struct.pack('<H', data)
 
     def gen_header(self):
@@ -195,7 +190,7 @@ class UlzWriter:
 
         padding = len(self.flags) % 4
         if padding:
-            self.flags += b'\x00' * (4-padding)
+            self.flags += b'\x00' * (4 - padding)
 
         # The decompression algorithm for ulz0 doesn't have any
         # counters for the final size like ulz2, it relies on the flag
@@ -221,6 +216,7 @@ class UlzWriter:
 if __name__ == "__main__":
     import sys
     import logging.config
+
     logging.basicConfig(filename='comp.log', level=logging.DEBUG)
     u = UlzWriter(sys.argv[1], 0, 1024, 32)
     u.pack_file()

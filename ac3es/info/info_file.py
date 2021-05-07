@@ -33,9 +33,8 @@ class InfoFile:
 
         try:
             return TimReader.get_tim_info(path)
-        except NotTimException as e:
+        except NotTimException:
             pass
 
         hash_value = md5_for_file(path)
         return self.db_md5.find(hash_value)
-

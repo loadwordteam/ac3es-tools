@@ -88,7 +88,7 @@ class UlzReader:
         bool_flags = []
         for x in range(32):
             bool_flags.insert(
-                0, 
+                0,
                 False if num_flags & (1 << x) else True
             )
         bool_flags.reverse()
@@ -182,5 +182,3 @@ class UlzReader:
             self.ulz_stream.close()
             decompressed_data = out_file.getvalue()
         return decompressed_data
-
-
