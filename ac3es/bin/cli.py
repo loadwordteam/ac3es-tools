@@ -90,8 +90,8 @@ class CliBin(BaseCliCommand):
             )
         elif args.merge:
             merge_files(
-                args.merge,
-                args.out_bin,
+                pathlib.Path(args.merge),
+                pathlib.Path(args.out_bin),
                 args.verbose
             )
 
