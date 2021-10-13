@@ -71,7 +71,6 @@ if __name__ == '__main__':
         commands[single_command.name] = single_command
 
     args = parser.parse_args()
-    print(BaseCliCommand.__subclasses__())
 
     try:
         if commands.get(args.command, None):
