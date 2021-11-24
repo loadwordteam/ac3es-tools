@@ -218,5 +218,6 @@ Ulz type 0 compression is finally working
 
 ## Contacts
 
-Gianluigi "Infrid" Cusimano <infrid@infrid.com>
-http://ac3es.infrid.com/
+Gianluigi "Infrid" Cusimano <infrid@infrid.com> 
+
+https://loadwordteam.com/
