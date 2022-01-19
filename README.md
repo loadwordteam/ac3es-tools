@@ -1,4 +1,4 @@
-[![Docker Repository on Quay](https://quay.io/repository/infrid/ac3es-tools/status "Docker Repository on Quay")](https://quay.io/repository/infrid/ac3es-tools)
+[![Docker Repository on Quay](https://quay.io/repository/loadwordteam/ac3es-tools/status "Docker Repository on Quay")](https://quay.io/repository/loadwordteam/ac3es-tools)
 
 # AC3ES Tools
 
