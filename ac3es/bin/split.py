@@ -100,6 +100,8 @@ def extract_files(stream: typing.BinaryIO, dest_path: pathlib.Path, list_path: p
     :return:
     """
     entries = read_index(stream)
+    pad_size = max(2, len(str(len(entries))))
+
     file_names = []
     stream.seek(0, 2)
     file_size = stream.tell()
@@ -118,7 +120,7 @@ def extract_files(stream: typing.BinaryIO, dest_path: pathlib.Path, list_path: p
         elif content[0:4] == b'Ulz\x1A':
             extension = '.ulz'
 
-        dest_file_path = dest_path.joinpath(f'{index:{0}{len(entries)}}{extension}')
+        dest_file_path = dest_path.joinpath(f'{index:{0}{pad_size}}{extension}')
 
         file_names.append(str(dest_file_path.resolve()))
 
