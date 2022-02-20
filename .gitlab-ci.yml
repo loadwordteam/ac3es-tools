@@ -13,7 +13,7 @@ linux-amd64:
     - mv dist ac3es-tools-linux-amd64
 
 windows-amd64:
-  image: quay.io/infrid/python3-wine-staging:latest
+  image: quay.io/loadwordteam/python3-wine-staging
   stage: build
   artifacts:
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA:0:8}-windows-i386"
