@@ -85,7 +85,7 @@ class CliBin(BaseCliCommand):
         if args.split:
             split_file(
                 pathlib.Path(args.split),
-                pathlib.Path(args.out_directory),
+                pathlib.Path(args.out_directory) if args.out_directory else None,
                 args.out_list
             )
         elif args.merge:

@@ -34,7 +34,7 @@ def split_file(bin_path: pathlib.Path, output_path: pathlib.Path = None, list_pa
         raise CliException("File {} does not exists", format(bin_path))
 
     if not output_path:
-        output_path = bin_path.joinpath('_bin_splitter')
+        output_path = bin_path.parent.joinpath(bin_path.name + '_bin_splitter')
 
     if not list_path:
         list_path = pathlib.Path(output_path).joinpath('bin_splitter_list.txt')
