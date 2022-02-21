@@ -62,6 +62,7 @@ class CliBin(BaseCliCommand):
             '--merge',
             '-m',
             metavar=('FILE_LIST|DIR'),
+            nargs='+',
             help='Reconstruct a bin file starting from a component list or a directory'
         )
 
@@ -90,7 +91,7 @@ class CliBin(BaseCliCommand):
             )
         elif args.merge:
             merge_files(
-                pathlib.Path(args.merge),
+                args.merge,
                 pathlib.Path(args.out_bin),
                 args.verbose
             )

@@ -22,9 +22,8 @@ import struct
 from ac3es.exceptions import CliException
 
 
-def merge_files(source_path: pathlib.Path, dest_path: pathlib.Path, verbose=False):
+def merge_files(source_path, dest_path: pathlib.Path, verbose=False):
     content_list = get_content_list(source_path)
-
     if verbose:
         for entry in content_list:
             print(dest_path.resolve(), entry)
@@ -37,19 +36,24 @@ def merge_files(source_path: pathlib.Path, dest_path: pathlib.Path, verbose=Fals
         dp.write(artefact)
 
 
-def get_content_list(source_list: pathlib.Path):
-    if source_list.is_file():
-        content_list = [
-            pathlib.Path(x.strip()) for x in source_list.read_text().split("\n") if x.strip()
-        ]
-        content_list = [
-            x.resolve() if x.is_absolute() else source_list.parent.joinpath(x).resolve()
-            for x in content_list
-        ]
-    elif source_list.is_dir():
-        content_list = [x.resolve() for x in source_list.iterdir() if
-                        x.is_file() and str(x).find('bin_splitter_list.txt') == -1]
-    else:
+def get_content_list(source_list):
+    content_list = [pathlib.Path(x).resolve() for x in source_list]
+    if len(source_list) == 1:
+        content_file = pathlib.Path(source_list[0])
+        if content_file.is_file():
+            content_list = [
+                pathlib.Path(x.strip()) for x in content_file.read_text().split("\n") if x.strip()
+            ]
+            content_list = [
+                x.resolve() if x.is_absolute() else content_file.parent.joinpath(x).resolve()
+                for x in content_list
+            ]
+        elif content_file.is_dir():
+            content_list = [x.resolve() for x in content_file.iterdir() if
+                            x.is_file() and str(x).find('bin_splitter_list.txt') == -1]
+        # in this case we sort the content of the entries, because life is weird, so windows file explorer
+        content_list.sort()
+    elif content_list is None:
         raise CliException('I need a valid file list or a directory')
 
     return content_list
@@ -63,7 +67,6 @@ def merge_all(content_list: typing.List[pathlib.Path]) -> bytes:
     :return:
     """
     chunks = []
-    content_list.sort()
     for filename in content_list:
         if os.sep == '/' and str(filename).find('\\') >= 0:
             real_path = str(pathlib.Path(pathlib.PureWindowsPath(filename)).resolve())

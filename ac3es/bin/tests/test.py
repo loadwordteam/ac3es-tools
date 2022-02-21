@@ -30,9 +30,9 @@ from ac3es.exceptions import BinDetectException
 class TestBin(unittest.TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
-        self.assets_dir = pathlib.Path(__file__).parent.joinpath('assets')
-        self.assets_list = pathlib.Path(__file__).parent.joinpath('assets_list.txt')
-        self.assets_test_bin = pathlib.Path(__file__).parent.joinpath('assets_test.bin')
+        self.assets_dir = [pathlib.Path(__file__).parent.joinpath('assets')]
+        self.assets_list = [pathlib.Path(__file__).parent.joinpath('assets_list.txt')]
+        self.assets_test_bin = [pathlib.Path(__file__).parent.joinpath('assets_test.bin')]
 
     def test_get_content(self):
         content_list_from_dir = [str(x.resolve()) for x in merge.get_content_list(self.assets_dir)]
@@ -52,7 +52,7 @@ class TestBin(unittest.TestCase):
         content_list_from_dir = [x.resolve() for x in merge.get_content_list(self.assets_dir)]
         container = merge.merge_all(content_list_from_dir)
 
-        with self.assets_test_bin.open('rb') as asset:
+        with self.assets_test_bin[0].open('rb') as asset:
             data = asset.read()
             self.assertEqual(len(container), len(data))
             self.assertEqual(container, data)
@@ -60,7 +60,7 @@ class TestBin(unittest.TestCase):
     def test_merge_files(self):
         with tempfile.NamedTemporaryFile() as tmp_file:
             merge.merge_files(self.assets_dir, pathlib.Path(tmp_file.name))
-            self.assertTrue(filecmp.cmp(tmp_file.name, self.assets_test_bin.resolve(), False))
+            self.assertTrue(filecmp.cmp(tmp_file.name, self.assets_test_bin[0].resolve(), False))
 
     def test_split_header(self):
         offsets = [
@@ -99,9 +99,9 @@ class TestBin(unittest.TestCase):
     def test_split(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_path = pathlib.Path(tmp_dir)
-            split.split_file(self.assets_test_bin, tmp_path)
+            split.split_file(self.assets_test_bin[0], tmp_path)
             extracted_list = [x.resolve() for x in tmp_path.iterdir() if
                               x.is_file() and str(x).find('bin_splitter_list.txt') == -1]
             test_assets = ['lulu.tim', 'matisse.tim', 'occhietto.tim', 'occhietto_big.ulz']
             for found in extracted_list:
-                self.assertTrue(filecmp.cmp(found, self.assets_dir.joinpath(test_assets.pop()), False))
+                self.assertTrue(filecmp.cmp(found, self.assets_dir[0].joinpath(test_assets.pop()), False))
