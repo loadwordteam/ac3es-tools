@@ -1,5 +1,5 @@
 # infrid/ac3es-tools
-FROM python:3.9.5-buster
+FROM python:3.10-bullseye
 
 RUN mkdir -p /opt/ac3es-tools \
     && cd /opt/ac3es-tools
@@ -21,5 +21,4 @@ RUN cd /opt/ac3es-tools \
     && chmod +x /usr/local/bin \
     && cd / && rm -rf /opt/ac3es-tools
 
-ENTRYPOINT ["tini", "--"]
-CMD ["/usr/local/bin/ac3es"]
+ENTRYPOINT ["tini", "--", "/usr/local/bin/ac3es"]

@@ -22,8 +22,35 @@ import struct
 from ac3es.exceptions import CliException
 
 
-def merge_files(source_path, dest_path: pathlib.Path, verbose=False):
-    content_list = get_content_list(source_path)
+def get_content_list_from_single(source: pathlib.Path):
+    content_list = []
+    if source.is_file():
+        content_list = [
+            pathlib.Path(x.strip()) for x in source.read_text().split("\n") if x.strip()
+        ]
+        # we could store some absolute paths of relative ones
+        content_list = [
+            x.resolve() if x.is_absolute() else source.parent.joinpath(x).resolve()
+            for x in content_list
+        ]
+
+    elif source.is_dir():
+        content_list = [x.resolve() for x in source.iterdir() if
+                        x.is_file() and str(x).find('bin_splitter_list.txt') == -1]
+    # in this case we sort the content of the entries, because life is weird, so windows file explorer
+    elif source is None:
+        raise CliException('I need a valid file list or a directory')
+
+    return content_list
+
+
+def merge_files_from_single(source_path, dest_path: pathlib.Path, verbose=False):
+    content_list = get_content_list_from_single(source_path)
+    content_list.sort()
+    merge_files_from_multi(content_list, dest_path, verbose)
+
+
+def merge_files_from_multi(content_list: typing.List[pathlib.Path], dest_path: pathlib.Path, verbose=False):
     if verbose:
         for entry in content_list:
             print(dest_path.resolve(), entry)
@@ -34,29 +61,6 @@ def merge_files(source_path, dest_path: pathlib.Path, verbose=False):
     artefact = merge_all(content_list)
     with dest_path.open('wb') as dp:
         dp.write(artefact)
-
-
-def get_content_list(source_list):
-    content_list = [pathlib.Path(x).resolve() for x in source_list]
-    if len(source_list) == 1:
-        content_file = pathlib.Path(source_list[0])
-        if content_file.is_file():
-            content_list = [
-                pathlib.Path(x.strip()) for x in content_file.read_text().split("\n") if x.strip()
-            ]
-            content_list = [
-                x.resolve() if x.is_absolute() else content_file.parent.joinpath(x).resolve()
-                for x in content_list
-            ]
-        elif content_file.is_dir():
-            content_list = [x.resolve() for x in content_file.iterdir() if
-                            x.is_file() and str(x).find('bin_splitter_list.txt') == -1]
-        # in this case we sort the content of the entries, because life is weird, so windows file explorer
-        content_list.sort()
-    elif content_list is None:
-        raise CliException('I need a valid file list or a directory')
-
-    return content_list
 
 
 def merge_all(content_list: typing.List[pathlib.Path]) -> bytes:

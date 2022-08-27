@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     Work on bin containers
       {0} bin --split=BPB/0114/0007.bin --out-directory=splitted/0007 --out-list=splitted/0007.txt
-      {0} bin --merge=splitted/0007.txt --out-bin=mod_0007.bin
+      {0} bin --merge-list=splitted/0007.txt --out-bin=mod_0007.bin
 
     More parameters are available, just type help for the sub command
       {0} ulz --help
@@ -53,8 +53,8 @@ if __name__ == '__main__':
       {0} bpb --help
 
     Report bugs to: infrid@infrid.com
-    AC3ES Version {1}
-    Homepage: <http://ac3es.infrid.com/>
+    AC3ES Tools Version {1}
+    Homepage: <https://loadwordteam.com/>
     """.format(sys.argv[0], ac3es.cli.VERSION)
 
     parser = argparse.ArgumentParser(

@@ -19,7 +19,7 @@ import pathlib
 
 from ac3es.cli import BaseCliCommand
 from ac3es.bin import split_file
-from ac3es.bin import merge_files
+from ac3es.bin import merge_files_from_single, merge_files_from_multi
 
 
 class CliBin(BaseCliCommand):
@@ -59,11 +59,22 @@ class CliBin(BaseCliCommand):
         )
 
         sub_bin_splitter.add_argument(
-            '--merge',
-            '-m',
-            metavar=('FILE_LIST|DIR'),
+            '--merge-dir',
+            metavar=('DIR'),
+            help='Create a bin file from a directory, entries will be sorted alphabetically'
+        )
+
+        sub_bin_splitter.add_argument(
+            '--merge-list',
+            metavar=('FILE_LIST'),
+            help='Use a file with filenames to create a bin, sorts the names first alphabetically'
+        )
+
+        sub_bin_splitter.add_argument(
+            '--merge-files',
+            metavar=('FILES'),
             nargs='+',
-            help='Reconstruct a bin file starting from a component list or a directory'
+            help='Reconstruct a bin file starting from a list of given filenames, no sort applies'
         )
 
         bin_splitter.add_argument(
@@ -89,9 +100,21 @@ class CliBin(BaseCliCommand):
                 pathlib.Path(args.out_directory) if args.out_directory else None,
                 args.out_list
             )
-        elif args.merge:
-            merge_files(
-                args.merge,
+        elif args.merge_dir:
+            merge_files_from_single(
+                pathlib.Path(args.merge_dir),
+                pathlib.Path(args.out_bin),
+                args.verbose
+            )
+        elif args.merge_list:
+            merge_files_from_single(
+                pathlib.Path(args.merge_list),
+                pathlib.Path(args.out_bin),
+                args.verbose
+            )
+        elif args.merge_files:
+            merge_files_from_multi(
+                [pathlib.Path(x).resolve() for x in args.merge_files],
                 pathlib.Path(args.out_bin),
                 args.verbose
             )

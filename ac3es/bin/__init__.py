@@ -15,5 +15,5 @@
 #  along with AC3ES Tools.  If not, see <http://www.gnu.org/licenses/>.
 
 from ac3es.bin.split import split_file
-from ac3es.bin.merge import merge_files
+from ac3es.bin.merge import merge_files_from_single, merge_files_from_multi
 from ac3es.bin.cli import CliBin
