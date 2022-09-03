@@ -15,7 +15,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ac3es-tools-$(git branch --show-current)-$(git rev-parse --short HEAD)-windows-amd64
+          name: ac3es-tools-windows-amd64
           path: dist
 
   linux-binary:
@@ -33,6 +33,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ac3es-tools-$(git branch --show-current)-$(git rev-parse --short HEAD)-linux-amd64
+          name: ac3es-tools-${{ env.GITHUB_REF_NAME }}-linux-amd64
           path: dist
 
