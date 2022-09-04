@@ -15,14 +15,16 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ac3es-tools-win-amd64
+          name: ac3es-tools-windows-amd64
           path: dist
 
   linux-binary:
-    runs-on: python3.10-bullseye
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+      - run: sudo apt-get update && sudo apt-get upgrade -y
+      - run: sudo apt-get install python3 python3-pip
       - run: python3 -m venv venv && source venv/bin/activate
       - run: python3 -m pip install pyinstaller -q
       - run: pyinstaller ac3es.spec
