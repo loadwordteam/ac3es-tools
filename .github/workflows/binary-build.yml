@@ -33,6 +33,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ac3es-tools-${{ env.GITHUB_REF_NAME }}-linux-amd64
+          name: ac3es-tools-linux-amd64
           path: dist
 
