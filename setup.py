@@ -17,9 +17,9 @@
 
 from setuptools import setup, find_packages
 
-import ac3es.cli.helpers
+import ac3es.cli
 
-with open('README.rst') as f:
+with open('README.md') as f:
     readme = f.read()
 
 with open('COPYING') as f:
@@ -27,12 +27,12 @@ with open('COPYING') as f:
 
 setup(
     name='ac3es-tools',
-    version=ac3es.cli.helpers.get_version(),
+    version=ac3es.cli.VERSION,
     description='Various tools for manipulate Ace Combat 3 game files',
     long_description=readme,
     author='Gianluigi "Infrid" Cusimano',
     author_email='infrid@infrid.com',
-    url='http://ac3es.infrid.com/',
+    url='https://loadwordteam.com',
     license=license,
     package_dir={'': 'ac3es'},
     packages=find_packages(where='ac3es', exclude=('tests', 'docs')),
