@@ -46,7 +46,7 @@ class TestBin(unittest.TestCase):
         for path in content_list_from_file:
             self.assertFalse(path.endswith('bin_splitter_list.txt'))
 
-        self.assertEqual("\n".join(content_list_from_dir), "\n".join(content_list_from_file))
+        self.assertEqual(content_list_from_dir, content_list_from_file)
 
     def test_merge_all(self):
         content_list_from_dir = [x.resolve() for x in merge.get_content_list_from_single(self.assets_dir)]
