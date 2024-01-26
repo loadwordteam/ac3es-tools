@@ -103,9 +103,12 @@ optional arguments:
                         Source TIM
   --copy-header         Copy the entire header data from source
   --copy-clut           Copy CLUT data from source
+  --copy-clut-xy        Copy CLUT coordinates from source
+  --set-clut-x CLUT_X   Set CLUT coordinate X
+  --set-clut-y CLUT_Y   Set CLUT coordinate Y
   --copy-vram           Copy V-RAM coordinates
-  --set-vram-x X        Set V-RAM coordinate X
-  --set-vram-y Y        Set V-RAM coordinate Y
+  --set-vram-x VRAM_X   Set V-RAM coordinate X
+  --set-vram-y VRAM_Y   Set V-RAM coordinate Y
 ```
 
 ### BPB unpack/repack command
@@ -176,6 +179,10 @@ They are both based on LZ77 and I compress using the same algorithm. I
 don't know why they used two nearly identical formats.
 
 ### Changelog
+
+#### 3.1
+
+- Set or copy CLUT coordinates
 
 #### 3.0
 

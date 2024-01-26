@@ -22,7 +22,8 @@ from ac3es.exceptions import CliException, NotTimException
 from ac3es.tim import TimReader
 
 
-def copy_tim_data(source_path, dest_path, replace_clut=False, replace_vram=False, vram_x=None, vram_y=None,
+def copy_tim_data(source_path, dest_path, copy_clut=False, copy_clut_xy=False, clut_x=None, clut_y=None,
+                  replace_vram=False, vram_x=None, vram_y=None,
                   replace_header=False):
     if pathlib.Path(source_path).resolve() == pathlib.Path(dest_path).resolve():
         raise CliException('cannot operate on the same file')
@@ -38,7 +39,7 @@ def copy_tim_data(source_path, dest_path, replace_clut=False, replace_vram=False
                 dest_stream.seek(0)
                 dest_stream.write(header)
 
-            if replace_clut:
+            if copy_clut or copy_clut_xy or clut_x or clut_y:
                 if source_tim.bpp not in (4, 8):
                     raise CliException('Source is {}bpp, clut data is only for 4bpp or 8bpp'.format(source_tim.bpp))
 
@@ -49,12 +50,31 @@ def copy_tim_data(source_path, dest_path, replace_clut=False, replace_vram=False
                     raise CliException(
                         'BBP must to be the same, source {}bpp, destination {}bpp'.format(source_tim.bpp, dest_tim.bpp))
 
-                source_stream.seek(source_tim.offsets['clut_header_start'], 0)
-                clut = source_stream.read(
-                    source_tim.offsets['clut_header_end'] - source_tim.offsets['clut_header_start']
-                )
-                dest_stream.seek(dest_tim.offsets['clut_header_start'], 0)
-                dest_stream.write(clut)
+                if copy_clut:
+                    source_stream.seek(source_tim.offsets['clut_header_start'], 0)
+                    clut = source_stream.read(
+                        source_tim.offsets['clut_header_end'] - source_tim.offsets['clut_header_start']
+                    )
+                    dest_stream.seek(dest_tim.offsets['clut_header_start'], 0)
+                    dest_stream.write(clut)
+                elif copy_clut_xy:
+                    source_stream.seek(source_tim.offsets['clut_header_start'], 0)
+                    clut_xy = source_stream.read(4)
+                    dest_stream.seek(dest_tim.offsets['clut_header_start'], 0)
+                    dest_stream.write(clut_xy)
+                elif clut_x or clut_y:
+                    if clut_x is not None:
+                        if clut_x < 0 or clut_x > 65535:
+                            raise CliException('clut-x out of range (0-65535)')
+
+                        dest_stream.seek(dest_tim.offsets['palette_x'], 0)
+                        dest_stream.write(struct.pack('<H', clut_x))
+                    if clut_y is not None:
+                        if clut_y < 0 or clut_y > 65535:
+                            raise CliException('clut-y out of range (0-65535)')
+
+                        dest_stream.seek(dest_tim.offsets['palette_y'], 0)
+                        dest_stream.write(struct.pack('<H', clut_y))
 
             if replace_vram:
                 dest_stream.seek(dest_tim.offsets['vram_x'], 0)

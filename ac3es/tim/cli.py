@@ -51,6 +51,26 @@ class CliTim(BaseCliCommand):
         )
 
         tim_parser.add_argument(
+            '--copy-clut-xy',
+            action='store_true',
+            help='Copy CLUT coordinates from source'
+        )
+
+        tim_parser.add_argument(
+            '--set-clut-x',
+            type=int,
+            metavar=('CLUT_X'),
+            help='Set CLUT coordinate X'
+        )
+
+        tim_parser.add_argument(
+            '--set-clut-y',
+            type=int,
+            metavar=('CLUT_Y'),
+            help='Set CLUT coordinate Y'
+        )
+
+        tim_parser.add_argument(
             '--copy-vram',
             action='store_true',
             help='Copy V-RAM coordinates'
@@ -59,14 +79,14 @@ class CliTim(BaseCliCommand):
         tim_parser.add_argument(
             '--set-vram-x',
             type=int,
-            metavar=('X'),
+            metavar=('VRAM_X'),
             help='Set V-RAM coordinate X'
         )
 
         tim_parser.add_argument(
             '--set-vram-y',
             type=int,
-            metavar=('Y'),
+            metavar=('VRAM_Y'),
             help='Set V-RAM coordinate Y'
         )
 
@@ -84,6 +104,9 @@ class CliTim(BaseCliCommand):
                 args.source_tim,
                 tim_file,
                 args.copy_clut,
+                args.copy_clut_xy,
+                args.set_clut_x,
+                args.set_clut_y,
                 args.copy_vram,
                 args.set_vram_x,
                 args.set_vram_y,
